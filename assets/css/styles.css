@@ -128,7 +128,6 @@ header.is-scrolled {
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 700;
   font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem);
@@ -137,21 +136,6 @@ header.is-scrolled {
   text-decoration: none;
   white-space: nowrap;
   z-index: 102;
-}
-
-.logo::before {
-  content: "";
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: url("../img/emblem.png") center / contain no-repeat;
-  filter: drop-shadow(0 2px 6px rgba(212, 175, 55, 0.35));
-  flex-shrink: 0;
-  transition: transform 0.4s var(--ease);
-}
-
-.logo:hover::before {
-  transform: rotate(-12deg) scale(1.08);
 }
 
 .header-right {
@@ -588,20 +572,6 @@ h2 {
   transform: translate(-50%, -55%);
   z-index: -1;
   pointer-events: none;
-}
-
-.hero-coin {
-  width: clamp(86px, 12vw, 124px);
-  height: clamp(86px, 12vw, 124px);
-  object-fit: contain;
-  margin-bottom: 1.5rem;
-  filter: drop-shadow(0 10px 28px rgba(212, 175, 55, 0.35));
-  animation: floatCoin 6s ease-in-out infinite;
-}
-
-@keyframes floatCoin {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
 }
 
 .spec-strip {
@@ -1483,8 +1453,9 @@ footer {
 
   .spec-strip {
     border-radius: var(--radius-md);
-    padding: 0.85rem 1rem;
-    gap: 0.45rem 0.9rem;
+    padding: 0.9rem 0.65rem;
+    gap: 0.45rem 0.35rem;
+    width: 100%;
   }
 
   .spec-pill + .spec-pill::before {
@@ -1492,10 +1463,20 @@ footer {
   }
 
   .spec-pill {
-    font-size: 0.72rem;
-    padding: 0.2rem 0.45rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    padding: 0.24rem 0.48rem;
     background: rgba(212, 175, 55, 0.06);
     border-radius: 6px;
+  }
+
+  .spec-pill.spec-edge {
+    flex-basis: 100%;
+    justify-content: center;
+    background: transparent;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    padding: 0.1rem 0;
   }
 
   .cta-group {
