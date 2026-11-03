@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monkey Business · Cagayan Valley</title>
+  <meta name="description" content="Against the grain. From the heart of Cagayan Valley. Monkey Business — we evolve differently.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --gold-dark: #b8860b;
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --text: #f5f5f5;
+      --muted: #a0a0a0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system_ui, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: overlay;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent);
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--gold); }
+
+    .lang-switch {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .lang-switch:hover {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      padding: 8rem 2rem 4rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 0.9;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+    }
+
+    .tagline {
+      font-size: 1.15rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.75rem;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      max-width: 540px;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .cta {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #000;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      border-radius: 50px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+    }
+
+    section {
+      padding: 7rem 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .manifesto { text-align: center; }
+
+    .manifesto h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      margin-bottom: 2rem;
+      color: var(--gold);
+    }
+
+    .manifesto p {
+      font-size: 1.3rem;
+      max-width: 680px;
+      margin: 0 auto 1.4rem;
+      color: var(--text);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.75rem;
+      margin-top: 3rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.12);
+      padding: 2.25rem 1.75rem;
+      border-radius: 14px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .card:hover {
+      border-color: var(--gold);
+      transform: translateY(-6px);
+    }
+    .card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--gold);
+    }
+    .card p { color: var(--muted); font-size: 0.98rem; }
+
+    footer {
+      padding: 3.5rem 2rem 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(212, 175, 55, 0.1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-coin {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.25rem;
+      opacity: 0.85;
+      filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.25));
+    }
+
+    .footer-text {
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+    }
+
+    .footer-text strong { color: var(--gold); }
+
+    @media (max-width: 700px) {
+      nav { display: none; }
+      section { padding: 5rem 1.5rem; }
+      .header-right { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">MONKEY BUSINESS</div>
+    <div class="header-right">
+      <nav>
+        <a href="#manifesto" data-en="Manifesto" data-tl="Manifesta">Manifesto</a>
+        <a href="#what" data-en="What We Do" data-tl="Ano ang Ginagawa Namin">What We Do</a>
+        <a href="#contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a>
+      </nav>
+      <button class="lang-switch" id="langBtn">TL</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="tagline" data-en="Against the Grain" data-tl="Labag sa Karaniwan">Against the Grain</div>
+    <h1>MONKEY<br>BUSINESS</h1>
+    <p class="subtitle" data-en="From the fertile ground of Cagayan Valley. We don't follow the current. We rewrite the rules of evolution." data-tl="Mula sa matabang lupa ng Cagayan Valley. Hindi kami sumusunod sa agos. Muli naming isinusulat ang mga patakaran ng ebolusyon.">From the fertile ground of Cagayan Valley. We don't follow the current. We rewrite the rules of evolution.</p>
+    <a href="#manifesto" class="cta" data-en="Enter the Valley" data-tl="Pumasok sa Lambak">Enter the Valley</a>
+  </section>
+
+  <section id="manifesto" class="manifesto">
+    <h2 data-en="We Evolve Differently." data-tl="Iba ang aming Ebolusyon.">We Evolve Differently.</h2>
+    <p data-en="Most wait for permission. Most follow the map someone else drew. We don't." data-tl="Karamihan ay naghihintay ng pahintulot. Karamihan ay sumusunod sa mapa na iginuhit ng iba. Kami ay hindi.">Most wait for permission. Most follow the map someone else drew. We don't.</p>
+    <p data-en="Born in the long valley between the Sierra Madre and the Cordilleras, Monkey Business is the refusal to stay inside the lines. Agriculture that thinks like technology. Technology that remembers the soil. Ideas that refuse to be domesticated." data-tl="Ipinanganak sa mahabang lambak sa pagitan ng Sierra Madre at Cordilleras, ang Monkey Business ay ang pagtanggi na manatili sa loob ng mga linya. Agrikultura na nag-iisip tulad ng teknolohiya. Teknolohiya na naaalala ang lupa. Mga ideya na ayaw mapag-alaga.">Born in the long valley between the Sierra Madre and the Cordilleras, Monkey Business is the refusal to stay inside the lines. Agriculture that thinks like technology. Technology that remembers the soil. Ideas that refuse to be domesticated.</p>
+    <p data-en="Against the grain isn't a slogan. It's the only way anything interesting ever happened." data-tl="Ang labag sa karaniwan ay hindi slogan. Ito ang tanging paraan kung paano nangyari ang anumang interesanteng bagay.">Against the grain isn't a slogan. It's the only way anything interesting ever happened.</p>
+  </section>
+
+  <section id="what">
+    <div class="cards">
+      <div class="card">
+        <h3 data-en="Unconventional Systems" data-tl="Hindi Karaniwang Sistema">Unconventional Systems</h3>
+        <p data-en="Infrastructure, automation, and monitoring that don't look like the ones in the textbooks. Built for people who actually use them." data-tl="Imprastraktura, automation, at pagsubaybay na hindi katulad ng nasa mga aklat. Ginawa para sa mga taong aktwal na gumagamit nito.">Infrastructure, automation, and monitoring that don't look like the ones in the textbooks. Built for people who actually use them.</p>
+      </div>
+      <div class="card">
+        <h3 data-en="Valley Roots" data-tl="Mga Ugat sa Lambak">Valley Roots</h3>
+        <p data-en="Cagayan Valley isn't a backdrop. It's the source. Local knowledge, long horizons, and the stubbornness that comes from growing things that matter." data-tl="Ang Cagayan Valley ay hindi background. Ito ang pinagmulan. Lokal na kaalaman, mahabang tanawin, at ang katigasan ng ulo na nagmumula sa pagtatanim ng mga bagay na mahalaga.">Cagayan Valley isn't a backdrop. It's the source. Local knowledge, long horizons, and the stubbornness that comes from growing things that matter.</p>
+      </div>
+      <div class="card">
+        <h3 data-en="Against the Default" data-tl="Labag sa Default">Against the Default</h3>
+        <p data-en="Whether it's software, systems, or strategies — we prefer the path that makes the conventional one look lazy." data-tl="Software man, sistema, o estratehiya — mas gusto namin ang landas na ginagawang tamad ang karaniwan.">Whether it's software, systems, or strategies — we prefer the path that makes the conventional one look lazy.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="text-align: center; padding-bottom: 3rem;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.6rem; color: var(--gold); margin-bottom: 1.25rem;" data-en="Ready to go against the grain?" data-tl="Handa ka na bang sumalungat sa agos?">Ready to go against the grain?</h2>
+    <p style="color: var(--muted); margin-bottom: 2rem;" data-en="Domain secured. The rest is being written." data-tl="Nakuha na ang domain. Ang iba ay isinusulat pa.">Domain secured. The rest is being written.</p>
+    <a href="mailto:hello@monkeybusiness.ph" class="cta">hello@monkeybusiness.ph</a>
+  </section>
+
+  <footer>
+    <img src="emblem.png" alt="Monkey Business Emblem" class="footer-coin">
+    <div class="footer-text">
+      <strong>MONKEY BUSINESS</strong> · CAGAYAN VALLEY<br>
+      <span data-en="Against the Grain · Est. in the valley, built for everywhere." data-tl="Labag sa Karaniwan · Itinatag sa lambak, ginawa para sa lahat.">Against the Grain · Est. in the valley, built for everywhere.</span>
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('langBtn');
+    let current = 'en';
+
+    function setLang(lang) {
+      current = lang;
+      btn.textContent = lang === 'en' ? 'TL' : 'EN';
+      document.documentElement.lang = lang === 'en' ? 'en' : 'tl';
+
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.dataset[lang];
+      });
+    }
+
+    btn.addEventListener('click', () => {
+      setLang(current === 'en' ? 'tl' : 'en');
+    });
+  </script>
+</body>
+</html>
