@@ -5,7 +5,7 @@ Static landing page for **monkeybusiness.ph**, designed for GitHub Pages.
 ## Deploy to GitHub Pages
 
 1. Create a new public repository (or use an existing one).
-2. Upload the contents of this folder (`index.html` + `emblem.png`) to the root of the repo.
+2. Upload this folder to the root of the repo. Pages stay in the root. Images, CSS, and JS live in `assets/`.
 3. Go to **Settings → Pages**.
 4. Source: Deploy from a branch → `main` / `root`.
 5. Save. Your site will be live at `https://yourusername.github.io/repo-name/` (or custom domain).
@@ -21,8 +21,10 @@ Static landing page for **monkeybusiness.ph**, designed for GitHub Pages.
 
 ## Files
 
-- `index.html` — full single-page site
-- `emblem.png` — the coin emblem (used in hero + footer)
+- `index.html`, `about.html`, and one page per flavour
+- `assets/css/styles.css`, `assets/js/site.js`
+- `assets/img/` — photos and the footer coin
+- `robots.txt` — allows crawling of the public site
 
 Theme: dark luxury, gold accents, floating coin, "Against the Grain" / Cagayan Valley manifesto. Fully responsive.
 

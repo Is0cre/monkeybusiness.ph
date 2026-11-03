@@ -3,480 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monkey Business · Cagayan Valley</title>
-  <meta name="description" content="Against the grain. From the heart of Cagayan Valley. Monkey Business — we evolve differently.">
+  <meta name="theme-color" content="#070706">
+  <title>Monkey Business · Craft Fruit Liqueur</title>
+  <meta name="description" content="Female-owned craft fruit liqueur from Isabela, Cagayan Valley. Real fruit. Real rum. Zero shortcuts. Coming in 2027.">
+  <link rel="canonical" href="https://monkeybusiness.ph/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Monkey Business">
+  <meta property="og:title" content="Monkey Business · Craft Fruit Liqueur">
+  <meta property="og:description" content="Female-owned craft fruit liqueur from Isabela, Cagayan Valley. Real fruit. Real rum. Zero shortcuts. Coming in 2027.">
+  <meta property="og:url" content="https://monkeybusiness.ph/">
+  <meta property="og:image" content="https://monkeybusiness.ph/assets/img/valley.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --gold: #d4af37;
-      --gold-light: #f3e5ab;
-      --gold-dark: #b8860b;
-      --bg: #0a0a0a;
-      --bg-card: #111111;
-      --text: #f5f5f5;
-      --muted: #a0a0a0;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system_ui, sans-serif;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1;
-      mix-blend-mode: overlay;
-    }
-
-    header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 1.5rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      background: rgba(10, 10, 10, 0.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
-    }
-
-    .logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.1em;
-      color: var(--gold);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      margin-left: 1.5rem;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-      transition: color 0.3s;
-    }
-    nav a:hover { color: var(--gold); }
-
-    .lang-switch {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .lang-flag {
-      width: 36px;
-      height: 24px;
-      padding: 0;
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 3px;
-      background: transparent;
-      cursor: pointer;
-      overflow: hidden;
-      line-height: 0;
-      opacity: 0.45;
-      transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .lang-flag svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    .lang-flag:hover,
-    .lang-flag.is-active {
-      opacity: 1;
-    }
-
-    .lang-flag.is-active {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 1px var(--gold);
-    }
-
-    .sr {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      border: 0;
-    }
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      padding: 8rem 2rem 4rem;
-    }
-
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3.5rem, 9vw, 7.5rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 0.9;
-      background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.75rem;
-    }
-
-    .tagline {
-      font-size: 1.15rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 1.75rem;
-    }
-
-    .subtitle {
-      font-size: 1.3rem;
-      max-width: 540px;
-      color: var(--muted);
-      margin-bottom: 2.5rem;
-    }
-
-    .cta {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-      color: #000;
-      text-decoration: none;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      border-radius: 50px;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .cta:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-    }
-
-    section {
-      padding: 7rem 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-      scroll-margin-top: 5rem;
-    }
-
-    .manifesto { text-align: center; }
-
-    .manifesto h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      margin-bottom: 2rem;
-      color: var(--gold);
-    }
-
-    .manifesto p {
-      font-size: 1.3rem;
-      max-width: 680px;
-      margin: 0 auto 1.4rem;
-      color: var(--text);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.75rem;
-      margin-top: 3rem;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid rgba(212, 175, 55, 0.12);
-      padding: 2.25rem 1.75rem;
-      border-radius: 14px;
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .card:hover {
-      border-color: var(--gold);
-      transform: translateY(-6px);
-    }
-    .card h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 0.75rem;
-      color: var(--gold);
-    }
-    .card p { color: var(--muted); font-size: 0.98rem; }
-
-    footer {
-      padding: 3.5rem 2rem 2rem;
-      text-align: center;
-      border-top: 1px solid rgba(212, 175, 55, 0.1);
-      position: relative;
-      z-index: 2;
-    }
-
-    .footer-coin {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1.25rem;
-      opacity: 0.85;
-      filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.25));
-    }
-
-    .footer-text {
-      color: var(--muted);
-      font-size: 0.85rem;
-      letter-spacing: 0.04em;
-      line-height: 1.7;
-    }
-
-    .footer-text strong { color: var(--gold); }
-
-    .valley {
-      max-width: 1120px;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 3rem;
-      align-items: center;
-    }
-
-    .valley-photo {
-      margin: 0;
-    }
-
-    .valley-photo img {
-      display: block;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1200 / 627;
-      object-fit: cover;
-      border-radius: 16px;
-      border: 1px solid rgba(212, 175, 55, 0.22);
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
-    }
-
-    .valley-photo figcaption {
-      margin-top: 0.7rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.04em;
-    }
-
-    .valley-copy h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.2rem, 4vw, 3.2rem);
-      color: var(--gold);
-      line-height: 1.05;
-      margin-bottom: 1.1rem;
-    }
-
-    .valley-copy .lead {
-      color: var(--text);
-      font-size: 1.08rem;
-    }
-
-    .ingredient-list {
-      list-style: none;
-      margin-top: 1.75rem;
-      display: grid;
-      gap: 1rem;
-    }
-
-    .ingredient-list li {
-      padding-left: 1rem;
-      border-left: 2px solid var(--gold);
-    }
-
-    .ingredient-list strong {
-      display: block;
-      font-family: 'Playfair Display', serif;
-      color: var(--gold);
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-    }
-
-    .ingredient-list span {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .fruit-row {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1.25rem;
-    }
-
-    .fruit-row figure {
-      margin: 0;
-    }
-
-    .fruit-row img {
-      display: block;
-      width: 100%;
-      height: 240px;
-      object-fit: cover;
-      border-radius: 16px;
-      border: 1px solid rgba(212, 175, 55, 0.22);
-      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
-    }
-
-    .fruit-row figcaption {
-      margin-top: 0.7rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    #contact h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.1rem, 4vw, 2.8rem);
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-    }
-
-    .contact-intro {
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .contact-form {
-      max-width: 560px;
-      margin: 0 auto;
-      text-align: left;
-      display: grid;
-      gap: 1rem;
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .field input,
-    .field textarea {
-      width: 100%;
-      background: #0e0e0e;
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      color: var(--text);
-      padding: 0.9rem 1rem;
-      border-radius: 10px;
-      font: inherit;
-    }
-
-    .field textarea {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .field input:focus,
-    .field textarea:focus {
-      outline: none;
-      border-color: var(--gold);
-    }
-
-    .contact-form .cta {
-      border: 0;
-      cursor: pointer;
-      justify-self: start;
-    }
-
-    .form-note,
-    .thanks {
-      color: var(--muted);
-      font-size: 0.88rem;
-      text-align: center;
-    }
-
-    .thanks {
-      margin: 0 auto 1.25rem;
-      max-width: 560px;
-      color: var(--gold-light);
-    }
-
-    .hp {
-      position: absolute;
-      left: -9999px;
-      height: 0;
-      width: 0;
-      opacity: 0;
-    }
-
-    @media (max-width: 800px) {
-      .valley {
-        grid-template-columns: 1fr;
-        gap: 1.75rem;
-      }
-
-      .valley-photo img {
-        height: auto;
-      }
-
-      .fruit-row {
-        grid-template-columns: 1fr;
-      }
-
-      .fruit-row img {
-        height: 220px;
-      }
-    }
-
-    @media (max-width: 700px) {
-      nav { display: none; }
-      section { padding: 5rem 1.5rem; }
-      .header-right { gap: 1rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <header>
-    <div class="logo">MONKEY BUSINESS</div>
+    <a class="logo" href="index.html">MONKEY BUSINESS</a>
     <div class="header-right">
-      <nav>
-        <a href="#manifesto" data-en="Manifesto" data-tl="Manifesta">Manifesto</a>
-        <a href="#valley" data-en="The Valley" data-tl="Ang Lambak">The Valley</a>
-        <a href="#what" data-en="What We Do" data-tl="Ano ang Ginagawa Namin">What We Do</a>
-        <a href="#contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr" data-en="Menu" data-tl="Menu">Menu</span>
+        <i></i>
+      </button>
+      <nav id="site-nav" aria-label="Primary">
+        <a href="index.html" aria-current="page" data-en="Home" data-tl="Home">Home</a>
+        <a href="about.html" data-en="About" data-tl="Tungkol">About</a>
+        <div class="drop">
+          <button type="button" class="drop-btn" aria-expanded="false" aria-controls="flavor-menu" data-en="Flavours" data-tl="Mga lasa">Flavours</button>
+          <div class="drop-menu" id="flavor-menu">
+            <a href="banana.html" data-en="Banana" data-tl="Saging">Banana</a>
+            <a href="mango.html" data-en="Mango" data-tl="Mangga">Mango</a>
+            <a href="calamansi.html" data-en="Calamansi" data-tl="Calamansi">Calamansi</a>
+            <a href="jackfruit.html" data-en="Jackfruit" data-tl="Langka">Jackfruit</a>
+          </div>
+        </div>
+        <a href="contact.html" data-en="Contact" data-tl="Kontak">Contact</a>
       </nav>
+
       <div class="lang-switch" role="group" aria-label="Language">
-        <button type="button" class="lang-flag is-active" data-lang="en" aria-pressed="true" title="English">
+        <button type="button" class="lang-flag" data-lang="en" aria-pressed="true" title="English">
           <span class="sr">English</span>
           <svg viewBox="0 0 60 30" aria-hidden="true">
-            <clipPath id="flag-uk"><rect width="60" height="30"/></clipPath>
-            <g clip-path="url(#flag-uk)">
-              <rect width="60" height="30" fill="#012169"/>
-              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
-              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/>
-              <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
-              <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/>
+            <rect width="60" height="30" fill="#B22234"/>
+            <path d="M0,3.46H60 M0,8.08H60 M0,12.69H60 M0,17.31H60 M0,21.92H60 M0,26.54H60" stroke="#fff" stroke-width="2.31"/>
+            <rect width="24" height="16.15" fill="#3C3B6E"/>
+            <g fill="#fff">
+              <circle cx="3" cy="2.6" r="0.85"/><circle cx="7.5" cy="2.6" r="0.85"/><circle cx="12" cy="2.6" r="0.85"/><circle cx="16.5" cy="2.6" r="0.85"/><circle cx="21" cy="2.6" r="0.85"/>
+              <circle cx="5.25" cy="5.3" r="0.85"/><circle cx="9.75" cy="5.3" r="0.85"/><circle cx="14.25" cy="5.3" r="0.85"/><circle cx="18.75" cy="5.3" r="0.85"/>
+              <circle cx="3" cy="8.1" r="0.85"/><circle cx="7.5" cy="8.1" r="0.85"/><circle cx="12" cy="8.1" r="0.85"/><circle cx="16.5" cy="8.1" r="0.85"/><circle cx="21" cy="8.1" r="0.85"/>
+              <circle cx="5.25" cy="10.8" r="0.85"/><circle cx="9.75" cy="10.8" r="0.85"/><circle cx="14.25" cy="10.8" r="0.85"/><circle cx="18.75" cy="10.8" r="0.85"/>
+              <circle cx="3" cy="13.5" r="0.85"/><circle cx="7.5" cy="13.5" r="0.85"/><circle cx="12" cy="13.5" r="0.85"/><circle cx="16.5" cy="13.5" r="0.85"/><circle cx="21" cy="13.5" r="0.85"/>
             </g>
           </svg>
         </button>
@@ -508,155 +88,156 @@
     </div>
   </header>
 
-  <section class="hero">
-    <div class="tagline" data-en="Against the Grain" data-tl="Labag sa Karaniwan">Against the Grain</div>
-    <h1>MONKEY<br>BUSINESS</h1>
-    <p class="subtitle" data-en="From the fertile ground of Cagayan Valley. We don't follow the current. We rewrite the rules of evolution." data-tl="Mula sa matabang lupa ng Cagayan Valley. Hindi kami sumusunod sa agos. Muli naming isinusulat ang mga patakaran ng ebolusyon.">From the fertile ground of Cagayan Valley. We don't follow the current. We rewrite the rules of evolution.</p>
-    <a href="#manifesto" class="cta" data-en="Enter the Valley" data-tl="Pumasok sa Lambak">Enter the Valley</a>
-  </section>
+  <main>
+    <section class="hero" id="top">
+      <img src="assets/img/emblem.png" alt="Monkey Business · Against the Grain emblem" class="hero-coin" width="120" height="120">
+      <p class="tagline" data-en="Craft fruit liqueur" data-tl="Likor mula sa prutas">Craft fruit liqueur</p>
+      <h1 data-en="Real fruit. Real rum." data-tl="Totoong prutas. Totoong rum.">Real fruit. Real rum.</h1>
+      <p class="subtitle" data-en="Zero shortcuts. Female-owned. From Isabela. Coming in 2027." data-tl="Walang shortcut. Babae ang may-ari. Mula sa Isabela. Darating sa 2027.">Zero shortcuts. Female-owned. From Isabela. Coming in 2027.</p>
+      <div class="cta-group">
+        <a class="cta" href="#line" data-en="The line" data-tl="Ang linya">The line</a>
+        <a class="cta cta-ghost" href="about.html" data-en="The house" data-tl="Ang bahay">The house</a>
+      </div>
 
-  <section id="manifesto" class="manifesto">
-    <h2 data-en="We Evolve Differently." data-tl="Iba ang aming Ebolusyon.">We Evolve Differently.</h2>
-    <p data-en="Most wait for permission. Most follow the map someone else drew. We don't." data-tl="Karamihan ay naghihintay ng pahintulot. Karamihan ay sumusunod sa mapa na iginuhit ng iba. Kami ay hindi.">Most wait for permission. Most follow the map someone else drew. We don't.</p>
-    <p data-en="Born in the long valley between the Sierra Madre and the Cordilleras, Monkey Business is the refusal to stay inside the lines. Agriculture that thinks like technology. Technology that remembers the soil. Ideas that refuse to be domesticated." data-tl="Ipinanganak sa mahabang lambak sa pagitan ng Sierra Madre at Cordilleras, ang Monkey Business ay ang pagtanggi na manatili sa loob ng mga linya. Agrikultura na nag-iisip tulad ng teknolohiya. Teknolohiya na naaalala ang lupa. Mga ideya na ayaw mapag-alaga.">Born in the long valley between the Sierra Madre and the Cordilleras, Monkey Business is the refusal to stay inside the lines. Agriculture that thinks like technology. Technology that remembers the soil. Ideas that refuse to be domesticated.</p>
-    <p data-en="Against the grain isn't a slogan. It's the only way anything interesting ever happened." data-tl="Ang labag sa karaniwan ay hindi slogan. Ito ang tanging paraan kung paano nangyari ang anumang interesanteng bagay.">Against the grain isn't a slogan. It's the only way anything interesting ever happened.</p>
-  </section>
+      <div class="spec-strip" aria-label="House specifications">
+        <span class="spec-pill"><strong data-en="Local Rum" data-tl="Lokal na Rum">Local Rum</strong></span>
+        <span class="spec-pill" data-en="Dual Maceration" data-tl="Dual Maceration">Dual Maceration</span>
+        <span class="spec-pill" data-en="Clear Glass" data-tl="Malinaw na Baso">Clear Glass</span>
+        <span class="spec-pill">Isabela, PH</span>
+        <span class="spec-pill"><strong>2027</strong></span>
+      </div>
+    </section>
 
-  <section id="what">
-    <div class="cards">
-      <div class="card">
-        <h3 data-en="Unconventional Systems" data-tl="Hindi Karaniwang Sistema">Unconventional Systems</h3>
-        <p data-en="Infrastructure, automation, and monitoring that don't look like the ones in the textbooks. Built for people who actually use them." data-tl="Imprastraktura, automation, at pagsubaybay na hindi katulad ng nasa mga aklat. Ginawa para sa mga taong aktwal na gumagamit nito.">Infrastructure, automation, and monitoring that don't look like the ones in the textbooks. Built for people who actually use them.</p>
+    <section class="center" id="owned">
+      <p class="tagline" data-en="About" data-tl="Tungkol">About</p>
+      <h2 data-en="Female-owned." data-tl="Babae ang may-ari.">Female-owned.</h2>
+      <p class="lede" data-en="Mara will own this house and she leads it. She comes from bakeries and food production. Isabela, Cagayan Valley. Launch is 2027." data-tl="Si Mara ang magiging may-ari ng bahay na ito at siya ang namumuno. Galing siya sa panaderya at produksyon ng pagkain. Isabela, Cagayan Valley. Ilulunsad sa 2027.">Mara will own this house and she leads it. She comes from bakeries and food production. Isabela, Cagayan Valley. Launch is 2027.</p>
+      <div class="cards">
+        <article class="card">
+          <div>
+            <span class="card-num">01 · HOUSE</span>
+            <h3 data-en="Female-owned" data-tl="Babae ang may-ari">Female-owned</h3>
+            <p data-en="Mara will own the house and lead it." data-tl="Si Mara ang magiging may-ari at mamumuno.">Mara will own the house and lead it.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <span class="card-num">02 · METHOD</span>
+            <h3 data-en="Zero shortcuts" data-tl="Walang shortcut">Zero shortcuts</h3>
+            <p data-en="Cold-process dual maceration. Local rum. Clear glass." data-tl="Cold-process dual maceration. Lokal na rum. Malinaw na baso.">Cold-process dual maceration. Local rum. Clear glass.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div>
+            <span class="card-num">03 · ORIGIN</span>
+            <h3>Isabela</h3>
+            <p data-en="Cagayan Valley, Philippines." data-tl="Cagayan Valley, Pilipinas.">Cagayan Valley, Philippines.</p>
+          </div>
+        </article>
       </div>
-      <div class="card">
-        <h3 data-en="Valley Roots" data-tl="Mga Ugat sa Lambak">Valley Roots</h3>
-        <p data-en="Cagayan Valley isn't a backdrop. It's the source. Local knowledge, long horizons, and the stubbornness that comes from growing things that matter." data-tl="Ang Cagayan Valley ay hindi background. Ito ang pinagmulan. Lokal na kaalaman, mahabang tanawin, at ang katigasan ng ulo na nagmumula sa pagtatanim ng mga bagay na mahalaga.">Cagayan Valley isn't a backdrop. It's the source. Local knowledge, long horizons, and the stubbornness that comes from growing things that matter.</p>
+      <div class="cta-group">
+        <a class="cta" href="about.html" data-en="About us" data-tl="Tungkol sa amin">About us</a>
       </div>
-      <div class="card">
-        <h3 data-en="Against the Default" data-tl="Labag sa Default">Against the Default</h3>
-        <p data-en="Whether it's software, systems, or strategies — we prefer the path that makes the conventional one look lazy." data-tl="Software man, sistema, o estratehiya — mas gusto namin ang landas na ginagawang tamad ang karaniwan.">Whether it's software, systems, or strategies — we prefer the path that makes the conventional one look lazy.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="valley" class="valley">
-    <figure class="valley-photo">
-      <img src="valley.jpg" alt="Rice field at dusk, with palms and a mountain in Cagayan Valley">
-      <figcaption>
-        <span data-en="Cagayan Valley" data-tl="Cagayan Valley">Cagayan Valley</span>
-      </figcaption>
-    </figure>
-    <div class="valley-copy">
-      <div class="tagline" data-en="From the ground" data-tl="Mula sa lupa">From the ground</div>
-      <h2 data-en="100% natural ingredients." data-tl="100% natural na sangkap.">100% natural ingredients.</h2>
-      <p class="lead" data-en="What we use starts in Cagayan Valley. Soil, rain, and a long season. Nothing reconstituted somewhere else and sent back with a story attached." data-tl="Ang ginagamit namin ay nagsisimula sa Cagayan Valley. Lupa, ulan, at mahabang panahon. Walang inayos sa ibang lugar at ibinalik na may kuwentong dikit.">What we use starts in Cagayan Valley. Soil, rain, and a long season. Nothing reconstituted somewhere else and sent back with a story attached.</p>
-      <ul class="ingredient-list">
-        <li>
-          <strong data-en="100% natural ingredients" data-tl="100% natural na sangkap">100% natural ingredients</strong>
-          <span data-en="Nothing synthesized, nothing padded out to make the label look full." data-tl="Walang sintetiko, walang pampalugit para lang mapuno ang etiketa.">Nothing synthesized, nothing padded out to make the label look full.</span>
-        </li>
-        <li>
-          <strong data-en="Grown in the valley" data-tl="Tanim sa lambak">Grown in the valley</strong>
-          <span data-en="Between the Sierra Madre and the Cordilleras. The place is the ingredient." data-tl="Sa pagitan ng Sierra Madre at ng Cordilleras. Ang lugar ang sangkap.">Between the Sierra Madre and the Cordilleras. The place is the ingredient.</span>
-        </li>
-        <li>
-          <strong data-en="In season" data-tl="Sa tamang panahon">In season</strong>
-          <span data-en="Harvested when the land is ready, not when a factory calendar says so." data-tl="Inaani kapag handa ang lupa, hindi kapag sinabi ng kalendaryo ng pabrika.">Harvested when the land is ready, not when a factory calendar says so.</span>
-        </li>
-        <li>
-          <strong data-en="A short path" data-tl="Maikling daan">A short path</strong>
-          <span data-en="From the field to what you actually hold. No stop in between to rewrite it." data-tl="Mula sa bukid hanggang sa hawak mo. Walang hintuan sa gitna para isulat itong muli.">From the field to what you actually hold. No stop in between to rewrite it.</span>
-        </li>
-      </ul>
-    </div>
-    <div class="fruit-row">
-      <figure>
-        <img src="calamansi.jpg" alt="Halved calamansi on a pile of whole green fruit">
-        <figcaption data-en="Calamansi" data-tl="Kalamansi">Calamansi</figcaption>
-      </figure>
-      <figure>
-        <img src="mango.jpg" alt="A heavy bunch of ripe mangoes at a fruit stall">
-        <figcaption data-en="Mango" data-tl="Mangga">Mango</figcaption>
-      </figure>
-      <figure>
-        <img src="banana.jpg" alt="Bunches of ripe yellow and green bananas on a wooden table">
-        <figcaption data-en="Banana" data-tl="Saging">Banana</figcaption>
-      </figure>
-    </div>
-  </section>
+    <section id="line" class="line">
+      <p class="tagline" data-en="The line" data-tl="Ang linya">The line</p>
+      <h2 data-en="Four fruits. All coming in 2027." data-tl="Apat na prutas. Lahat darating sa 2027.">Four fruits. All coming in 2027.</h2>
+      <div class="line-grid">
+        <a class="flavor" href="banana.html">
+          <div class="flavor-media">
+            <img class="wax-seal" src="assets/img/wax-black.png" alt="Monkey Business Black Wax Seal" loading="lazy">
+            <img src="assets/img/banana.jpg" alt="Bunches of ripe yellow and green bananas" loading="lazy">
+          </div>
+          <div class="body">
+            <h3 data-en="Banana" data-tl="Saging">Banana</h3>
+            <p data-en="Blend of varieties. Year round. Black wax." data-tl="Pinaghalong uri. Buong taon. Itim na wax.">Blend of varieties. Year round. Black wax.</p>
+            <p class="soon" data-en="Coming in 2027" data-tl="Darating sa 2027">Coming in 2027</p>
+          </div>
+        </a>
+        <a class="flavor" href="mango.html">
+          <div class="flavor-media">
+            <img class="wax-seal" src="assets/img/wax-gold.png" alt="Monkey Business Gold Wax Seal" loading="lazy">
+            <img src="assets/img/mango.jpg" alt="A heavy bunch of ripe mangoes" loading="lazy">
+          </div>
+          <div class="body">
+            <h3 data-en="Mango" data-tl="Mangga">Mango</h3>
+            <p data-en="Carabao. March to May. Gold wax." data-tl="Carabao. Marso hanggang Mayo. Gintong wax.">Carabao. March to May. Gold wax.</p>
+            <p class="soon" data-en="Coming in 2027" data-tl="Darating sa 2027">Coming in 2027</p>
+          </div>
+        </a>
+        <a class="flavor" href="calamansi.html">
+          <div class="flavor-media">
+            <img class="wax-seal" src="assets/img/wax-green.png" alt="Monkey Business Green Wax Seal" loading="lazy">
+            <img src="assets/img/calamansi.jpg" alt="Halved calamansi on a pile of whole green fruit" loading="lazy">
+          </div>
+          <div class="body">
+            <h3>Calamansi</h3>
+            <p data-en="November to December. Green wax." data-tl="Nobyembre hanggang Disyembre. Berdeng wax.">November to December. Green wax.</p>
+            <p class="soon" data-en="Coming in 2027" data-tl="Darating sa 2027">Coming in 2027</p>
+          </div>
+        </a>
+        <a class="flavor" href="jackfruit.html">
+          <div class="flavor-media">
+            <img class="wax-seal" src="assets/img/wax-amber.png" alt="Monkey Business Amber Wax Seal" loading="lazy">
+            <img src="assets/img/jackfruit.jpg" alt="Cut jackfruit and pods in a basket" loading="lazy">
+          </div>
+          <div class="body">
+            <h3 data-en="Jackfruit" data-tl="Langka">Jackfruit</h3>
+            <p data-en="June to July. Amber wax." data-tl="Hunyo hanggang Hulyo. Amber na wax.">June to July. Amber wax.</p>
+            <p class="soon" data-en="Coming in 2027" data-tl="Darating sa 2027">Coming in 2027</p>
+          </div>
+        </a>
+      </div>
+    </section>
 
-  <section id="contact" style="text-align: center; padding-bottom: 3rem;">
-    <h2 data-en="Ready to go against the grain?" data-tl="Handa ka na bang sumalungat sa agos?">Ready to go against the grain?</h2>
-    <p class="contact-intro" data-en="Tell us what you are growing, building, or looking for." data-tl="Sabihin kung ano ang tinatanim, ginagawa, o hinahanap mo.">Tell us what you are growing, building, or looking for.</p>
-    <p class="thanks" id="thanks" hidden data-en="Received. We will reply to that email." data-tl="Natanggap namin. Magrereply kami sa email na iyon.">Received. We will reply to that email.</p>
-    <form class="contact-form" method="POST" data-to="">
-      <input type="hidden" name="_subject" value="Monkey Business — note from the site">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="true">
-      <input type="hidden" name="_next" value="https://monkeybusiness.ph/?sent=1#contact">
-      <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <div class="field">
-        <label for="name" data-en="Name" data-tl="Pangalan">Name</label>
-        <input id="name" name="name" type="text" required autocomplete="name" data-en="Your name" data-tl="Ang pangalan mo" placeholder="Your name">
+    <section id="valley">
+      <div class="valley-feature">
+        <figure class="valley-frame">
+          <img src="assets/img/valley.jpg" alt="Rice field at dusk between the Sierra Madre and the Cordilleras in Cagayan Valley" loading="lazy">
+          <figcaption class="valley-caption">
+            <span>Isabela · Cagayan Valley</span>
+            <span data-en="Sierra Madre to Cordilleras" data-tl="Sierra Madre hanggang Cordilleras">Sierra Madre to Cordilleras</span>
+          </figcaption>
+        </figure>
+        <div>
+          <p class="tagline" data-en="The proof" data-tl="Ang patunay">The proof</p>
+          <h2 data-en="In clear glass." data-tl="Sa malinaw na baso.">In clear glass.</h2>
+          <p class="lede" data-en="Mass-market liqueur is flavored and colored to look like fruit. Ours is cold-process dual maceration in local rum, bottled in clear glass with zero synthetic flavor or dye." data-tl="Ang likor sa masa ay nilalasahan at kinukulayan para magmukhang prutas. Ang sa amin ay cold-process dual maceration sa lokal na rum, sa malinaw na baso nang walang sintetikong lasa o kulay.">Mass-market liqueur is flavored and colored to look like fruit. Ours is cold-process dual maceration in local rum, bottled in clear glass with zero synthetic flavor or dye.</p>
+          <ul class="method-list">
+            <li>
+              <strong data-en="100% Philippine fruit" data-tl="100% prutas ng Pilipinas">100% Philippine fruit</strong>
+              <span data-en="Harvested in season in Cagayan Valley. Never from concentrate or synthetic essence." data-tl="Inaani sa tamang panahon sa Cagayan Valley. Hindi mula sa concentrate o sintetikong lasa.">Harvested in season in Cagayan Valley. Never from concentrate or synthetic essence.</span>
+            </li>
+            <li>
+              <strong data-en="Allocation & Trade — 2027" data-tl="Alokasyon at Kalakalan — 2027">Allocation & Trade — 2027</strong>
+              <span data-en="Direct inquiries for bar programs, trade partners, and first-batch allocations." data-tl="Direktang ugnayan para sa mga bar, kasosyo sa kalakalan, at unang alokasyon.">Direct inquiries for bar programs, trade partners, and first-batch allocations.</span>
+            </li>
+          </ul>
+          <div class="cta-group back">
+            <a class="cta" href="contact.html" data-en="Request Allocation" data-tl="Hilingin ang alokasyon">Request Allocation</a>
+          </div>
+        </div>
       </div>
-      <div class="field">
-        <label for="email" data-en="Email" data-tl="Email">Email</label>
-        <input id="email" name="email" type="email" required autocomplete="email" data-en="you@example.com" data-tl="ikaw@example.com" placeholder="you@example.com">
-      </div>
-      <div class="field">
-        <label for="message" data-en="Message" data-tl="Mensahe">Message</label>
-        <textarea id="message" name="message" required data-en="What should we know?" data-tl="Ano ang dapat naming malaman?" placeholder="What should we know?"></textarea>
-      </div>
-      <button class="cta" type="submit" data-en="Send" data-tl="Ipadala">Send</button>
-    </form>
-  </section>
+    </section>
+  </main>
 
   <footer>
-    <img src="emblem.png" alt="Monkey Business Emblem" class="footer-coin">
+    <nav class="footer-links" aria-label="Footer">
+      <a href="index.html" aria-current="page" data-en="Home" data-tl="Home">Home</a>
+      <a href="about.html" data-en="About" data-tl="Tungkol">About</a>
+      <a href="contact.html" data-en="Contact" data-tl="Kontak">Contact</a>
+      <a href="banana.html" data-en="Banana" data-tl="Saging">Banana</a>
+      <a href="mango.html" data-en="Mango" data-tl="Mangga">Mango</a>
+      <a href="calamansi.html" data-en="Calamansi" data-tl="Calamansi">Calamansi</a>
+      <a href="jackfruit.html" data-en="Jackfruit" data-tl="Langka">Jackfruit</a>
+    </nav>
+    <img src="assets/img/emblem.png" alt="Monkey Business emblem" class="footer-coin" width="76" height="76" loading="lazy">
     <div class="footer-text">
-      <strong>MONKEY BUSINESS</strong> · CAGAYAN VALLEY<br>
-      <span data-en="Against the Grain · Est. in the valley, built for everywhere." data-tl="Labag sa Karaniwan · Itinatag sa lambak, ginawa para sa lahat.">Against the Grain · Est. in the valley, built for everywhere.</span>
+      <strong>MONKEY BUSINESS</strong> · ISABELA, CAGAYAN VALLEY<br>
+      <span data-en="Female-owned. Craft fruit liqueur." data-tl="Babae ang may-ari. Likor mula sa prutas.">Female-owned. Craft fruit liqueur.</span>
     </div>
   </footer>
-
-  <script>
-    const flags = document.querySelectorAll('.lang-flag');
-    let current = 'en';
-
-    function setLang(lang) {
-      current = lang;
-      document.documentElement.lang = lang === 'en' ? 'en' : 'tl';
-      flags.forEach(flag => {
-        const on = flag.dataset.lang === lang;
-        flag.classList.toggle('is-active', on);
-        flag.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
-
-      document.querySelectorAll('[data-en]').forEach(el => {
-        const text = el.dataset[lang];
-        if (el.matches('input, textarea')) {
-          el.placeholder = text;
-        } else {
-          el.textContent = text;
-        }
-      });
-    }
-
-    flags.forEach(flag => {
-      flag.addEventListener('click', () => setLang(flag.dataset.lang));
-    });
-
-    const contactForm = document.querySelector('.contact-form');
-    const contactTo = contactForm.dataset.to.trim();
-    if (contactTo) {
-      contactForm.action = 'https://formsubmit.co/' + contactTo;
-    } else {
-      contactForm.addEventListener('submit', (event) => event.preventDefault());
-    }
-
-    if (new URLSearchParams(location.search).get('sent') === '1') {
-      document.getElementById('thanks').hidden = false;
-    }
-  </script>
+  <script src="assets/js/site.js"></script>
 </body>
 </html>
