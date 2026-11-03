@@ -48,7 +48,9 @@
       justify-content: space-between;
       align-items: center;
       z-index: 100;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent);
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
     }
 
     .logo {
@@ -75,19 +77,50 @@
     nav a:hover { color: var(--gold); }
 
     .lang-switch {
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      padding: 0.4rem 0.9rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
-    .lang-switch:hover {
-      background: var(--gold);
-      color: #000;
+
+    .lang-flag {
+      width: 36px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 3px;
+      background: transparent;
+      cursor: pointer;
+      overflow: hidden;
+      line-height: 0;
+      opacity: 0.45;
+      transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .lang-flag svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .lang-flag:hover,
+    .lang-flag.is-active {
+      opacity: 1;
+    }
+
+    .lang-flag.is-active {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px var(--gold);
+    }
+
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
     }
 
     .hero {
@@ -151,6 +184,7 @@
       margin: 0 auto;
       position: relative;
       z-index: 2;
+      scroll-margin-top: 5rem;
     }
 
     .manifesto { text-align: center; }
@@ -220,6 +254,201 @@
 
     .footer-text strong { color: var(--gold); }
 
+    .valley {
+      max-width: 1120px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .valley-photo {
+      margin: 0;
+    }
+
+    .valley-photo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1200 / 627;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .valley-photo figcaption {
+      margin-top: 0.7rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+
+    .valley-copy h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      color: var(--gold);
+      line-height: 1.05;
+      margin-bottom: 1.1rem;
+    }
+
+    .valley-copy .lead {
+      color: var(--text);
+      font-size: 1.08rem;
+    }
+
+    .ingredient-list {
+      list-style: none;
+      margin-top: 1.75rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .ingredient-list li {
+      padding-left: 1rem;
+      border-left: 2px solid var(--gold);
+    }
+
+    .ingredient-list strong {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .ingredient-list span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .fruit-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .fruit-row figure {
+      margin: 0;
+    }
+
+    .fruit-row img {
+      display: block;
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .fruit-row figcaption {
+      margin-top: 0.7rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #contact h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.1rem, 4vw, 2.8rem);
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .contact-intro {
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .contact-form {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: left;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: #0e0e0e;
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      color: var(--text);
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    .field textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .contact-form .cta {
+      border: 0;
+      cursor: pointer;
+      justify-self: start;
+    }
+
+    .form-note,
+    .thanks {
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .thanks {
+      margin: 0 auto 1.25rem;
+      max-width: 560px;
+      color: var(--gold-light);
+    }
+
+    .hp {
+      position: absolute;
+      left: -9999px;
+      height: 0;
+      width: 0;
+      opacity: 0;
+    }
+
+    @media (max-width: 800px) {
+      .valley {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+      }
+
+      .valley-photo img {
+        height: auto;
+      }
+
+      .fruit-row {
+        grid-template-columns: 1fr;
+      }
+
+      .fruit-row img {
+        height: 220px;
+      }
+    }
+
     @media (max-width: 700px) {
       nav { display: none; }
       section { padding: 5rem 1.5rem; }
@@ -233,10 +462,49 @@
     <div class="header-right">
       <nav>
         <a href="#manifesto" data-en="Manifesto" data-tl="Manifesta">Manifesto</a>
+        <a href="#valley" data-en="The Valley" data-tl="Ang Lambak">The Valley</a>
         <a href="#what" data-en="What We Do" data-tl="Ano ang Ginagawa Namin">What We Do</a>
         <a href="#contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a>
       </nav>
-      <button class="lang-switch" id="langBtn">TL</button>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" class="lang-flag is-active" data-lang="en" aria-pressed="true" title="English">
+          <span class="sr">English</span>
+          <svg viewBox="0 0 60 30" aria-hidden="true">
+            <clipPath id="flag-uk"><rect width="60" height="30"/></clipPath>
+            <g clip-path="url(#flag-uk)">
+              <rect width="60" height="30" fill="#012169"/>
+              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/>
+              <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
+              <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/>
+            </g>
+          </svg>
+        </button>
+        <button type="button" class="lang-flag" data-lang="tl" aria-pressed="false" title="Tagalog">
+          <span class="sr">Tagalog</span>
+          <svg viewBox="0 0 60 30" aria-hidden="true">
+            <rect width="60" height="15" fill="#0038A8"/>
+            <rect y="15" width="60" height="15" fill="#CE1126"/>
+            <polygon points="0,0 27,15 0,30" fill="#fff"/>
+            <g fill="#FCD116" transform="translate(9.2 15)">
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(45)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(90)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(135)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(180)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(225)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(270)"/>
+              <polygon points="0,-5.6 0.55,-2.7 -0.55,-2.7" transform="rotate(315)"/>
+              <circle r="2.15"/>
+            </g>
+            <g fill="#FCD116">
+              <polygon points="0,-1.35 .38,-.42 1.35,-.42 .58,.16 .88,1.15 0,.55 -.88,1.15 -.58,.16 -1.35,-.42 -.38,-.42" transform="translate(4.4 5.6)"/>
+              <polygon points="0,-1.35 .38,-.42 1.35,-.42 .58,.16 .88,1.15 0,.55 -.88,1.15 -.58,.16 -1.35,-.42 -.38,-.42" transform="translate(4.4 24.4)"/>
+              <polygon points="0,-1.35 .38,-.42 1.35,-.42 .58,.16 .88,1.15 0,.55 -.88,1.15 -.58,.16 -1.35,-.42 -.38,-.42" transform="translate(16.6 15)"/>
+            </g>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -271,10 +539,76 @@
     </div>
   </section>
 
+  <section id="valley" class="valley">
+    <figure class="valley-photo">
+      <img src="valley.jpg" alt="Rice field at dusk, with palms and a mountain in Cagayan Valley">
+      <figcaption>
+        <span data-en="Cagayan Valley" data-tl="Cagayan Valley">Cagayan Valley</span>
+      </figcaption>
+    </figure>
+    <div class="valley-copy">
+      <div class="tagline" data-en="From the ground" data-tl="Mula sa lupa">From the ground</div>
+      <h2 data-en="100% natural ingredients." data-tl="100% natural na sangkap.">100% natural ingredients.</h2>
+      <p class="lead" data-en="What we use starts in Cagayan Valley. Soil, rain, and a long season. Nothing reconstituted somewhere else and sent back with a story attached." data-tl="Ang ginagamit namin ay nagsisimula sa Cagayan Valley. Lupa, ulan, at mahabang panahon. Walang inayos sa ibang lugar at ibinalik na may kuwentong dikit.">What we use starts in Cagayan Valley. Soil, rain, and a long season. Nothing reconstituted somewhere else and sent back with a story attached.</p>
+      <ul class="ingredient-list">
+        <li>
+          <strong data-en="100% natural ingredients" data-tl="100% natural na sangkap">100% natural ingredients</strong>
+          <span data-en="Nothing synthesized, nothing padded out to make the label look full." data-tl="Walang sintetiko, walang pampalugit para lang mapuno ang etiketa.">Nothing synthesized, nothing padded out to make the label look full.</span>
+        </li>
+        <li>
+          <strong data-en="Grown in the valley" data-tl="Tanim sa lambak">Grown in the valley</strong>
+          <span data-en="Between the Sierra Madre and the Cordilleras. The place is the ingredient." data-tl="Sa pagitan ng Sierra Madre at ng Cordilleras. Ang lugar ang sangkap.">Between the Sierra Madre and the Cordilleras. The place is the ingredient.</span>
+        </li>
+        <li>
+          <strong data-en="In season" data-tl="Sa tamang panahon">In season</strong>
+          <span data-en="Harvested when the land is ready, not when a factory calendar says so." data-tl="Inaani kapag handa ang lupa, hindi kapag sinabi ng kalendaryo ng pabrika.">Harvested when the land is ready, not when a factory calendar says so.</span>
+        </li>
+        <li>
+          <strong data-en="A short path" data-tl="Maikling daan">A short path</strong>
+          <span data-en="From the field to what you actually hold. No stop in between to rewrite it." data-tl="Mula sa bukid hanggang sa hawak mo. Walang hintuan sa gitna para isulat itong muli.">From the field to what you actually hold. No stop in between to rewrite it.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="fruit-row">
+      <figure>
+        <img src="calamansi.jpg" alt="Halved calamansi on a pile of whole green fruit">
+        <figcaption data-en="Calamansi" data-tl="Kalamansi">Calamansi</figcaption>
+      </figure>
+      <figure>
+        <img src="mango.jpg" alt="A heavy bunch of ripe mangoes at a fruit stall">
+        <figcaption data-en="Mango" data-tl="Mangga">Mango</figcaption>
+      </figure>
+      <figure>
+        <img src="banana.jpg" alt="Bunches of ripe yellow and green bananas on a wooden table">
+        <figcaption data-en="Banana" data-tl="Saging">Banana</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <section id="contact" style="text-align: center; padding-bottom: 3rem;">
-    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.6rem; color: var(--gold); margin-bottom: 1.25rem;" data-en="Ready to go against the grain?" data-tl="Handa ka na bang sumalungat sa agos?">Ready to go against the grain?</h2>
-    <p style="color: var(--muted); margin-bottom: 2rem;" data-en="Domain secured. The rest is being written." data-tl="Nakuha na ang domain. Ang iba ay isinusulat pa.">Domain secured. The rest is being written.</p>
-    <a href="mailto:hello@monkeybusiness.ph" class="cta">hello@monkeybusiness.ph</a>
+    <h2 data-en="Ready to go against the grain?" data-tl="Handa ka na bang sumalungat sa agos?">Ready to go against the grain?</h2>
+    <p class="contact-intro" data-en="Tell us what you are growing, building, or looking for." data-tl="Sabihin kung ano ang tinatanim, ginagawa, o hinahanap mo.">Tell us what you are growing, building, or looking for.</p>
+    <p class="thanks" id="thanks" hidden data-en="Received. We will reply to that email." data-tl="Natanggap namin. Magrereply kami sa email na iyon.">Received. We will reply to that email.</p>
+    <form class="contact-form" method="POST" data-to="">
+      <input type="hidden" name="_subject" value="Monkey Business — note from the site">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="true">
+      <input type="hidden" name="_next" value="https://monkeybusiness.ph/?sent=1#contact">
+      <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="field">
+        <label for="name" data-en="Name" data-tl="Pangalan">Name</label>
+        <input id="name" name="name" type="text" required autocomplete="name" data-en="Your name" data-tl="Ang pangalan mo" placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="email" data-en="Email" data-tl="Email">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="email" data-en="you@example.com" data-tl="ikaw@example.com" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="message" data-en="Message" data-tl="Mensahe">Message</label>
+        <textarea id="message" name="message" required data-en="What should we know?" data-tl="Ano ang dapat naming malaman?" placeholder="What should we know?"></textarea>
+      </div>
+      <button class="cta" type="submit" data-en="Send" data-tl="Ipadala">Send</button>
+    </form>
   </section>
 
   <footer>
@@ -286,22 +620,43 @@
   </footer>
 
   <script>
-    const btn = document.getElementById('langBtn');
+    const flags = document.querySelectorAll('.lang-flag');
     let current = 'en';
 
     function setLang(lang) {
       current = lang;
-      btn.textContent = lang === 'en' ? 'TL' : 'EN';
       document.documentElement.lang = lang === 'en' ? 'en' : 'tl';
+      flags.forEach(flag => {
+        const on = flag.dataset.lang === lang;
+        flag.classList.toggle('is-active', on);
+        flag.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
 
       document.querySelectorAll('[data-en]').forEach(el => {
-        el.textContent = el.dataset[lang];
+        const text = el.dataset[lang];
+        if (el.matches('input, textarea')) {
+          el.placeholder = text;
+        } else {
+          el.textContent = text;
+        }
       });
     }
 
-    btn.addEventListener('click', () => {
-      setLang(current === 'en' ? 'tl' : 'en');
+    flags.forEach(flag => {
+      flag.addEventListener('click', () => setLang(flag.dataset.lang));
     });
+
+    const contactForm = document.querySelector('.contact-form');
+    const contactTo = contactForm.dataset.to.trim();
+    if (contactTo) {
+      contactForm.action = 'https://formsubmit.co/' + contactTo;
+    } else {
+      contactForm.addEventListener('submit', (event) => event.preventDefault());
+    }
+
+    if (new URLSearchParams(location.search).get('sent') === '1') {
+      document.getElementById('thanks').hidden = false;
+    }
   </script>
 </body>
 </html>
