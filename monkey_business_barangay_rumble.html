@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no">
+    <title>Monkey Business: Barangay Rumble</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pixel-font: 'Press Start 2P', monospace;
+            --retro-font: 'VT323', monospace;
+        }
+        body {
+            font-family: var(--pixel-font);
+            background-color: #080d07;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+        .arcade-font {
+            font-family: var(--pixel-font);
+        }
+        .dialogue-font {
+            font-family: var(--retro-font);
+        }
+        /* Retro CRT Scanlines & Arcade Glow */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 15;
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+        .crt-flicker {
+            animation: textFlicker 0.08s infinite alternate;
+        }
+        @keyframes textFlicker {
+            0% { opacity: 0.98; }
+            100% { opacity: 1; }
+        }
+        /* Screen wobble/shake */
+        .wobble-drunk {
+            filter: hue-rotate(calc(var(--drunk-deg, 0) * 1deg)) saturate(calc(100% + var(--drunk-deg, 0) * 1.5%));
+            transform: scale(calc(1 + var(--drunk-scale, 0)));
+            transition: filter 0.1s ease-out;
+        }
+        @keyframes quake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-6px, 6px); }
+            40% { transform: translate(6px, -4px); }
+            60% { transform: translate(-4px, -6px); }
+            80% { transform: translate(4px, 4px); }
+            100% { transform: translate(0, 0); }
+        }
+        .screen-shake {
+            animation: quake 0.28s cubic-bezier(.36,.07,.19,.97) both;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen text-amber-200">
+
+    <!-- Arcade Frame Container -->
+    <div id="game-cabinet" class="relative w-full max-w-[850px] h-[96vh] max-h-[820px] bg-slate-950 border-4 border-amber-600 rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.25)] flex flex-col overflow-hidden crt">
+        
+        <!-- Header HUD -->
+        <div id="hud-bar" class="absolute top-0 left-0 w-full z-20 px-3 py-2 bg-gradient-to-b from-black/90 via-black/60 to-transparent flex justify-between items-start pointer-events-none text-[10px] md:text-xs">
+            <!-- Left: Lives & Score -->
+            <div class="flex flex-col gap-1.5 pointer-events-auto">
+                <div class="flex items-center gap-1.5 bg-black/70 px-2.5 py-1 rounded-lg border border-red-500/40">
+                    <span id="label-lives" class="text-red-400">BUHAY:</span>
+                    <span id="hearts-hud" class="tracking-widest text-sm">❤️❤️❤️</span>
+                </div>
+                <div class="bg-black/70 px-2.5 py-1 rounded-lg border border-amber-500/40 flex items-center gap-2">
+                    <span id="label-score" class="text-amber-400">₱ESOS:</span>
+                    <span id="score-hud" class="text-yellow-300 text-sm">00000</span>
+                </div>
+            </div>
+
+            <!-- Center: Level & Enemy Shout -->
+        <div class="flex flex-col items-center">
+            <div id="level-badge" class="bg-amber-600 text-black px-2.5 py-0.5 rounded font-black tracking-wider text-[10px] uppercase shadow">
+                LVL 1: ALING TESSIE (ALICIA)
+            </div>
+            <div id="enemy-shout" class="dialogue-font text-lg md:text-xl text-yellow-300 font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-center animate-pulse">
+                "WALANG UTANG DITO!"
+            </div>
+        </div>
+
+        <!-- Right: Drunk-o-Meter & Language Switcher -->
+        <div class="flex flex-col items-end gap-1.5 pointer-events-auto">
+            <!-- Flag Language & Music Toggle Buttons -->
+            <div class="flex items-center gap-1.5">
+                <button id="bgm-toggle-btn" onclick="toggleMusic()" class="bg-slate-900/90 border border-amber-400/60 hover:bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer shadow-md transition-transform active:scale-95 flex items-center gap-1" title="Toggle Chiptune Music">
+                    <span id="bgm-icon">🎵</span>
+                </button>
+                <button id="lang-toggle-btn" onclick="toggleLanguage()" class="bg-emerald-950/90 border border-emerald-400/60 hover:bg-emerald-800 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider cursor-pointer shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
+                    <span id="lang-flag-hud" class="text-sm">🇵🇭</span>
+                    <span id="lang-label" class="text-[8px]">TAGALOG</span>
+                </button>
+            </div>
+            <div class="bg-black/70 px-2 py-0.5 rounded border border-purple-500/40 text-[9px] flex items-center gap-1">
+                <span id="drunk-status-title" class="text-green-400 font-bold">SOBER</span>
+                <span id="multiplier-tag" class="text-xs bg-amber-500 text-black px-1 rounded font-bold hidden">2X</span>
+            </div>
+            <div class="w-28 md:w-36 h-3.5 bg-slate-900 rounded-full border border-purple-500/50 p-0.5 overflow-hidden">
+                <div id="drunk-meter-fill" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-600 transition-all duration-200" style="width: 0%;"></div>
+            </div>
+            <span id="drunk-percent" class="text-[9px] text-purple-300 font-mono">0.00‰ BAC</span>
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <canvas id="gameCanvas" class="w-full h-full flex-grow cursor-crosshair"></canvas>
+
+    <!-- START SCREEN OVERLAY -->
+    <div id="modal-start" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center p-4 text-center">
+        <div id="start-badge" class="text-amber-500 text-xs md:text-sm tracking-widest mb-1 animate-pulse">ISABELA VALLEY SPECIAL • CAGAYAN GRANARY</div>
+        <h1 class="text-2xl md:text-4xl text-amber-400 tracking-wider drop-shadow-[0_4px_0_#92400e] mb-1">MONKEY BUSINESS</h1>
+        <h2 id="start-subtitle" class="text-base md:text-lg text-emerald-400 tracking-wider mb-3">🍻 BARANGAY RUMBLE 🍻</h2>
+
+        <!-- Quick Flag Lang Switch in Menu -->
+        <div class="flex items-center gap-3 mb-3 bg-black/75 px-4 py-1.5 rounded-full border border-amber-500/40 shadow-lg">
+            <button onclick="setLanguage('tl')" id="btn-lang-tl" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-black flex items-center gap-1.5 transition-all transform scale-105 shadow">
+                <span class="text-base">🇵🇭</span> <span>TAGALOG</span>
+            </button>
+            <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 flex items-center gap-1.5 transition-all hover:bg-slate-700">
+                <span class="text-base">🇬🇧</span> <span>ENGLISH</span>
+            </button>
+        </div>
+
+        <!-- Player Profile Input -->
+        <div class="bg-slate-900/90 border-2 border-amber-600 p-4 rounded-xl max-w-sm w-full mb-3 shadow-xl text-left">
+            <label id="lbl-player-name" class="block text-[10px] text-amber-300 mb-1">PANGALAN NG TSAMPYON (NAME):</label>
+            <div class="flex gap-2 mb-3">
+                <input id="player-name-input" type="text" maxlength="12" value="Tito Boy" 
+                    class="bg-black text-amber-300 border border-amber-500 px-3 py-1.5 text-xs rounded uppercase w-full focus:outline-none focus:ring-1 focus:ring-amber-300">
+                <button id="btn-save-name" onclick="savePlayerName()" class="bg-amber-600 text-black px-3 py-1 text-[10px] font-bold rounded hover:bg-amber-500">SET</button>
+            </div>
+            <div class="text-[10px] text-slate-400 flex justify-between">
+                <span id="lbl-record">RECORD:</span>
+                <span id="player-highscore-display" class="text-amber-300">₱0</span>
+            </div>
+            <div class="text-[10px] text-slate-400 flex justify-between">
+                <span id="lbl-rank">RANK:</span>
+                <span id="player-title-display" class="text-emerald-400">BAGUHAN (ROOKIE)</span>
+            </div>
+        </div>
+
+        <!-- How To Play Quick Guide -->
+        <div id="guide-box" class="text-[9px] md:text-[10px] text-amber-200/80 max-w-md bg-black/50 p-3 rounded-lg border border-slate-700 mb-4 space-y-1 text-left">
+        </div>
+
+        <button id="btn-start-game" onclick="launchGame()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black px-8 py-3.5 rounded-xl border-b-4 border-amber-900 active:translate-y-1 text-xs md:text-sm font-black tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.5)]">
+            SUMABAK NA! (START)
+        </button>
+    </div>
+
+    <!-- GAME OVER / BARANGAY BLOTTER OVERLAY -->
+    <div id="modal-gameover" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-4 text-center">
+        <div id="gameover-banner" class="text-red-500 text-xs tracking-widest mb-1 animate-ping">⚠️ OFFICIAL BARANGAY INCIDENT REPORT ⚠️</div>
+        <h2 id="gameover-title" class="text-2xl md:text-3xl text-rose-500 drop-shadow-[0_3px_0_#4c0519] mb-3">BAGSAK SI GAGONG UNGGOY!</h2>
+
+        <!-- Blotter Card -->
+        <div class="bg-amber-100 text-slate-900 p-4 rounded-lg max-w-sm w-full mb-4 shadow-2xl border-4 border-dashed border-amber-800 text-left relative rotate-[-1deg]">
+            <div id="blotter-header" class="text-[9px] text-center font-bold tracking-widest border-b-2 border-slate-900 pb-1 mb-2">
+                LALAWIGAN NG ISABELA • TANGGAPAN NG BARANGAY
+            </div>
+            <div class="space-y-1 text-[10px]">
+                <div class="flex justify-between">
+                    <span id="lbl-blotter-suspect" class="font-bold">SUSPEK:</span>
+                    <span id="blotter-name" class="font-bold underline">TITO BOY</span>
+                </div>
+                <div class="flex justify-between">
+                    <span id="lbl-blotter-score" class="font-bold">NAKULIMBAT (SCORE):</span>
+                    <span id="blotter-score" class="font-bold text-amber-900">₱00000</span>
+                </div>
+                <div class="flex justify-between">
+                    <span id="lbl-blotter-bottles" class="font-bold">NAINOM NA BOTE:</span>
+                    <span id="blotter-bottles" class="font-bold text-emerald-800">0 Bote</span>
+                </div>
+                <div class="flex justify-between">
+                    <span id="lbl-blotter-cause" class="font-bold">KAHIHITNATNAN:</span>
+                    <span id="blotter-cause" class="font-bold text-rose-800">Dukot sa Palayan</span>
+                </div>
+                <div class="flex justify-between pt-1 border-t border-slate-400">
+                    <span id="lbl-blotter-title" class="font-bold">BAGONG TITULO:</span>
+                    <span id="blotter-title" class="font-black text-purple-900">BARANGAY LEGEND</span>
+                </div>
+            </div>
+            <div id="blotter-footer-quote" class="mt-3 text-[8px] text-slate-600 italic text-center">
+                "Pinatutunayan na ang nasabing unggoy ay nagdulot ng kalasingan sa gitna ng palayan ng Isabela."
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button id="btn-retry" onclick="launchGame()" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-lg border-b-4 border-amber-800 text-xs font-black">
+                ULITIN! (RETRY)
+            </button>
+            <button id="btn-leaderboard-open" onclick="toggleLeaderboard()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-4 py-2.5 rounded-lg border border-amber-500/50 text-xs">
+                LEADERBOARD
+            </button>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD MODAL -->
+    <div id="modal-leaderboard" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-4 text-center">
+        <h3 id="leaderboard-heading" class="text-xl text-amber-400 mb-3 tracking-wider">🏆 ISABELA HALL OF FAME 🏆</h3>
+        <div id="leaderboard-list" class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-xl p-3 mb-4 text-[10px] space-y-2">
+        </div>
+        <button id="btn-leaderboard-close" onclick="toggleLeaderboard()" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded text-xs">
+            ISARA (CLOSE)
+        </button>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div id="mobile-controls" class="absolute bottom-2 left-0 w-full px-4 py-1 flex justify-between items-center z-20 md:hidden pointer-events-auto">
+        <div class="flex gap-2">
+            <button id="touch-left" class="w-14 h-14 bg-slate-900/80 active:bg-amber-600 border-2 border-amber-500/50 rounded-2xl flex items-center justify-center text-xl text-amber-300 shadow-lg active:scale-95 transition-transform">
+                ◀
+            </button>
+            <button id="touch-right" class="w-14 h-14 bg-slate-900/80 active:bg-amber-600 border-2 border-amber-500/50 rounded-2xl flex items-center justify-center text-xl text-amber-300 shadow-lg active:scale-95 transition-transform">
+                ▶
+            </button>
+        </div>
+        <div class="flex gap-2">
+            <button id="touch-jump" class="w-16 h-14 bg-blue-950/80 active:bg-blue-600 border-2 border-blue-500/50 rounded-2xl flex flex-col items-center justify-center text-xs text-blue-300 shadow-lg active:scale-95 transition-transform">
+                <span class="text-sm">🦘</span>
+                <span class="text-[8px] font-bold">JUMP</span>
+            </button>
+            <button id="touch-dash" class="w-16 h-14 bg-red-950/80 active:bg-red-600 border-2 border-red-500/50 rounded-2xl flex flex-col items-center justify-center text-xs text-red-300 shadow-lg active:scale-95 transition-transform">
+                <span class="text-sm">⚡</span>
+                <span class="text-[8px] font-bold">DASH</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- SOUND SYNTHESIZER & GAME ENGINE -->
+<script>
+    /* ==========================================================================
+       1. STORAGE (LOCALSTORAGE / COOKIES) - DECLARED FIRST
+       ========================================================================== */
+    const Storage = {
+        prefix: 'mb_rumble_',
+        get(key, fallback) {
+            try {
+                const item = localStorage.getItem(this.prefix + key);
+                return item ? JSON.parse(item) : fallback;
+            } catch {
+                return fallback;
+            }
+        },
+        set(key, val) {
+            try {
+                localStorage.setItem(this.prefix + key, JSON.stringify(val));
+            } catch(e) {
+                console.warn("Storage restricted", e);
+            }
+        },
+        getPlayer() {
+            return this.get('player_data', {
+                name: 'Tito Boy',
+                highScore: 0,
+                lifetimeBottles: 0,
+                title: 'BAGUHAN (ROOKIE)'
+            });
+        },
+        savePlayer(data) {
+            this.set('player_data', data);
+        },
+        getLeaderboard() {
+            return this.get('highscores', [
+                { name: "Manong Dante", score: 8500, title: "Cauayan King" },
+                { name: "Tito Rodolfo", score: 6200, title: "Ilagan Tanod" },
+                { name: "Aling Tessie", score: 4400, title: "Alicia Queen" },
+                { name: "Marites #1", score: 2800, title: "Roxas Chismis" }
+            ]);
+        },
+        recordScore(name, score, title) {
+            const list = this.getLeaderboard();
+            list.push({ name, score, title });
+            list.sort((a, b) => b.score - a.score);
+            const trimmed = list.slice(0, 7);
+            this.set('highscores', trimmed);
+            return trimmed;
+        }
+    };
+
+    /* ==========================================================================
+       2. LEVELS & ISABELA CONFIGURATION
+       ========================================================================== */
+    const LEVELS = [
+        {
+            id: 1,
+            enemyType: "tessie",
+            trashItems: ['pandesal', 'candy'],
+            bannerTown: "ALICIA, ISABELA",
+            targetScore: 1600
+        },
+        {
+            id: 2,
+            enemyType: "tanod",
+            trashItems: ['san_mig_bottle', 'blotter_paper'],
+            bannerTown: "ILAGAN CITY (CAPITAL)",
+            targetScore: 3800
+        },
+        {
+            id: 3,
+            enemyType: "tricycle",
+            trashItems: ['sparkplug', 'rccola'],
+            bannerTown: "CAUAYAN • MAGAT HIGHWAY",
+            targetScore: 7200
+        },
+        {
+            id: 4,
+            enemyType: "marites",
+            trashItems: ['mango_peel', 'chismis_bubble'],
+            bannerTown: "ROXAS CORN CAPITAL",
+            targetScore: 13000
+        }
+    ];
+
+    /* ==========================================================================
+       3. LOCALIZATION SYSTEM (EN <-> TL)
+       ========================================================================== */
+    let currentLang = 'tl';
+    let currentLevelIdx = 0;
+
+    const I18N = {
+        tl: {
+            langCode: "TAGALOG",
+            flag: "🇵🇭",
+            lives: "BUHAY:",
+            pesos: "₱ESOS:",
+            sober: "SOBER (1X)",
+            tipsy: "MAY TAMA (2X)",
+            drunk: "LASENGGO (3X)",
+            passedOutNotice: "BAGSAK! (PASSED OUT)",
+            wokeUpNotice: "GISING NA!",
+            levelUpNotice: "NEXT LEVEL! BAGONG KALABAN!",
+            startBadge: "ISABELA VALLEY SPECIAL • CAGAYAN GRANARY",
+            startSubtitle: "🍻 BARANGAY RUMBLE 🍻",
+            langPrompt: "WIKA / LANGUAGE:",
+            playerName: "PANGALAN NG TSAMPYON (NAME):",
+            set: "SET",
+            record: "RECORD:",
+            rank: "RANK:",
+            startBtn: "SUMABAK NA! (START)",
+            guideHtml: `
+                <p>🍺 <span class="text-amber-300">Hulihin ang Monkey Business:</span> +₱100 & tataas ang Tama.</p>
+                <p>🌀 <span class="text-purple-300">May Tama (Lasing):</span> 2X & 3X Points pero hahataw ang gewang!</p>
+                <p>🥖 <span class="text-rose-400">Iwas Skrap sa Taas:</span> Bato-batong pandesal, boteng basag, sparkplug!</p>
+                <p>🐕 <span class="text-amber-400">Panganib sa Lupa:</span> Tumalon (W/Up/Space) para iwasan ang Askal, Adik sa Kanto, at Patrol Pulis!</p>
+                <p>😵 <span class="text-red-400">100% BAC:</span> Babagsak at tutulog si unggoy sa palayan!</p>
+            `,
+            gameoverBanner: "⚠️ OPISYAL NA BLOTTER REPORT NG BARANGAY ⚠️",
+            gameoverTitle: "BAGSAK SI GAGONG UNGGOY!",
+            blotterHeader: "LALAWIGAN NG ISABELA • TANGGAPAN NG BARANGAY",
+            blotterSuspect: "SUSPEK:",
+            blotterScore: "NAKULIMBAT (SCORE):",
+            blotterBottles: "NAINOM NA BOTE:",
+            blotterCause: "KAHIHITNATNAN:",
+            blotterTitle: "BAGONG TITULO:",
+            blotterFooter: '"Pinatutunayan na ang nasabing unggoy ay nagdulot ng kalasingan sa gitna ng mga palayan ng Isabela."',
+            retryBtn: "ULITIN! (RETRY)",
+            leaderboardBtn: "LEADERBOARD",
+            leaderboardHeading: "🏆 ISABELA HALL OF FAME 🏆",
+            closeBtn: "ISARA (CLOSE)",
+            ranks: {
+                immortal: "ALAK DEMON (IMMORTAL)",
+                champion: "BARANGAY TSAMPYON",
+                king: "ISABELA TAMBAY KING",
+                fighter: "LUMALABAN (FIGHTER)",
+                rookie: "BAGUHAN (ROOKIE)",
+                lightweight: "LIGHTWEIGHT (DUKOT)"
+            },
+            lossReasons: {
+                trashHit: "Tinamaan ng Skrap sa Gitna ng Maisan!",
+                passedOutArrest: "Dukot ng Tanod Dahil Bagsak sa Riles!",
+                hitByTricycle: "Nasagasaan ng Tricycle sa Highway ng Alicia!",
+                dogBite: "Kinagat ng Askal sa Binti habang Lasing!",
+                adikAttack: "Inatake ng Adik sa Kanto sa Isabela!",
+                policeArrest: "Nahuli at Binalya ng Pulis sa Checkpoint!"
+            },
+            hitWords: ["ARAY!", "BONK!", "HOY!", "PATAY!", "AGUY!", "AWW!", "ARAGUY!"],
+            levels: [
+                {
+                    name: "LVL 1: ALING TESSIE (ALICIA)",
+                    enemyName: "Aling Tessie",
+                    quotes: ["WALANG UTANG DITO!", "BAYAD MUNA!", "HAYOP KANG UNGGOY KA!", "ISULAT KO TO SA LISTAHAN!"]
+                },
+                {
+                    name: "LVL 2: BARANGAY TANOD (ILAGAN)",
+                    enemyName: "Tito Rodolfo",
+                    quotes: ["CURFEW NA HOY!", "PRRRT! TIGIL DIYAN!", "WALANG INUMAN SA KALYE!", "BLOTTER KA SA AKIN!"]
+                },
+                {
+                    name: "LVL 3: MANONG DANTE (CAUAYAN)",
+                    enemyName: "Manong Dante",
+                    quotes: ["TABI! GOD IS MY PILOT!", "BEEP! BEEEP!", "PUMARA KA SA KANTO!", "MAY METRO TO HOY!"]
+                },
+                {
+                    name: "LVL 4: MARITES TRIBUNAL (ROXAS)",
+                    enemyName: "The Marites Trio",
+                    quotes: ["ALAM MO BA YUNG BALITA?!", "NAGHIWALAY NA DAW SILA!", "PURO KA INOM SA MAISAN!", "CHISMIS BULLET HELL!"]
+                }
+            ]
+        },
+        en: {
+            langCode: "ENGLISH",
+            flag: "🇬🇧",
+            lives: "LIVES:",
+            pesos: "₱ESOS:",
+            sober: "SOBER (1X)",
+            tipsy: "TIPSY (2X)",
+            drunk: "WASTED (3X)",
+            passedOutNotice: "PASSED OUT!",
+            wokeUpNotice: "WOKE UP!",
+            levelUpNotice: "NEXT LEVEL! NEW ISABELA BOSS!",
+            startBadge: "ISABELA VALLEY SPECIAL • CAGAYAN GRANARY",
+            startSubtitle: "🍻 BARANGAY RUMBLE 🍻",
+            langPrompt: "LANGUAGE / WIKA:",
+            playerName: "CHAMPION NAME:",
+            set: "SET",
+            record: "RECORD:",
+            rank: "RANK:",
+            startBtn: "LET'S RUMBLE! (START)",
+            guideHtml: `
+                <p>🍺 <span class="text-amber-300">Catch Monkey Business Rum:</span> +₱100 & fills Drunk-o-meter.</p>
+                <p>🌀 <span class="text-purple-300">Tipsy / Drunk:</span> 2X & 3X multipliers, but monkey starts swaying!</p>
+                <p>🥖 <span class="text-rose-400">Dodge Aerial Junk:</span> Hard pandesal, broken bottles & gossip!</p>
+                <p>🐕 <span class="text-amber-400">Ground Hazards:</span> Jump (W/Up/Space) to leap over stray dogs, street addicts & police checkpoints!</p>
+                <p>😵 <span class="text-red-400">100% BAC:</span> Faceplant in the cornfield and fall asleep!</p>
+            `,
+            gameoverBanner: "⚠️ OFFICIAL POLICE & BARANGAY INCIDENT REPORT ⚠️",
+            gameoverTitle: "MONKEY DOWN & OUT!",
+            blotterHeader: "PROVINCE OF ISABELA • OFFICE OF THE BARANGAY",
+            blotterSuspect: "SUSPECT:",
+            blotterScore: "LOOT COLLECTED (SCORE):",
+            blotterBottles: "BOTTLES CONSUMED:",
+            blotterCause: "REASON FOR APPREHENSION:",
+            blotterTitle: "NEW EARNED TITLE:",
+            blotterFooter: '"Certifying that the aforementioned monkey caused extreme drunken chaos across Isabela corn and rice fields."',
+            retryBtn: "RETRY! (ULIT)",
+            leaderboardBtn: "LEADERBOARD",
+            leaderboardHeading: "🏆 ISABELA HALL OF FAME 🏆",
+            closeBtn: "CLOSE",
+            ranks: {
+                immortal: "LIQUOR DEMON (IMMORTAL)",
+                champion: "BARANGAY CHAMPION",
+                king: "ISABELA TAMBAY KING",
+                fighter: "RESILIENT FIGHTER",
+                rookie: "ROOKIE DRINKER",
+                lightweight: "LIGHTWEIGHT (DUKOT)"
+            },
+            lossReasons: {
+                trashHit: "Knocked out by junk in the cornfields!",
+                passedOutArrest: "Caught snoring by the Tanod on the tracks!",
+                hitByTricycle: "Sideswiped by a tricycle on Alicia highway!",
+                dogBite: "Bit by a rabid Askal stray dog while drunk!",
+                adikAttack: "Mugged by a shady street addict on the corner!",
+                policeArrest: "Busted and batoned at a PNP police checkpoint!"
+            },
+            hitWords: ["OUCH!", "BONK!", "HEY!", "KNOCKED!", "YIKES!", "OOF!"],
+            levels: [
+                {
+                    name: "LVL 1: ALING TESSIE (ALICIA)",
+                    enemyName: "Aling Tessie",
+                    quotes: ["NO CREDIT HERE!", "PAY YOUR DEBT FIRST!", "GET OUT OF MY STORE!", "I'M LISTING YOUR DEBT!"]
+                },
+                {
+                    name: "LVL 2: BARANGAY TANOD (ILAGAN)",
+                    enemyName: "Tito Rodolfo",
+                    quotes: ["CURFEW HOURS HOY!", "PRRRT! FREEZE RIGHT THERE!", "NO DRINKING IN PUBLIC!", "YOU'RE GETTING BLOTTERED!"]
+                },
+                {
+                    name: "LVL 3: MANONG DANTE (CAUAYAN)",
+                    enemyName: "Manong Dante",
+                    quotes: ["MOVE ASIDE! GOD IS MY PILOT!", "BEEP! BEEEP!", "FLAG DOWN AT THE CORNER!", "MY METER IS RUNNING!"]
+                },
+                {
+                    name: "LVL 4: MARITES TRIBUNAL (ROXAS)",
+                    enemyName: "The Marites Trio",
+                    quotes: ["HAVE YOU HEARD THE TEA?!", "THEY BROKE UP ALREADY!", "YOU'RE ALWAYS DRUNK IN CORNFIELDS!", "CHISMIS BULLET HELL!"]
+                }
+            ]
+        }
+    };
+
+    function computeRankTitle(finalScore, bottles) {
+        const r = I18N[currentLang].ranks;
+        if (finalScore > 10000) return r.immortal;
+        if (finalScore > 6000) return r.champion;
+        if (finalScore > 3500) return r.king;
+        if (bottles > 20) return r.fighter;
+        return r.lightweight;
+    }
+
+    function setLanguage(lang) {
+        currentLang = (lang === 'en') ? 'en' : 'tl';
+        Storage.set('user_lang', currentLang);
+        applyLanguage();
+    }
+
+    function toggleLanguage() {
+        setLanguage(currentLang === 'tl' ? 'en' : 'tl');
+    }
+
+    function applyLanguage() {
+        const t = I18N[currentLang];
+
+        document.getElementById('lang-label').innerText = t.langCode;
+        document.getElementById('lang-flag-hud').innerText = t.flag;
+        document.getElementById('label-lives').innerText = t.lives;
+        document.getElementById('label-score').innerText = t.pesos;
+
+        document.getElementById('start-badge').innerText = t.startBadge;
+        document.getElementById('start-subtitle').innerText = t.startSubtitle;
+        document.getElementById('lbl-player-name').innerText = t.playerName;
+        document.getElementById('btn-save-name').innerText = t.set;
+        document.getElementById('lbl-record').innerText = t.record;
+        document.getElementById('lbl-rank').innerText = t.rank;
+        document.getElementById('guide-box').innerHTML = t.guideHtml;
+        document.getElementById('btn-start-game').innerText = t.startBtn;
+
+        const tlBtn = document.getElementById('btn-lang-tl');
+        const enBtn = document.getElementById('btn-lang-en');
+        if (currentLang === 'tl') {
+            tlBtn.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-black flex items-center gap-1.5 transition-all transform scale-105 shadow-[0_0_12px_rgba(245,158,11,0.6)]";
+            enBtn.className = "px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 flex items-center gap-1.5 transition-all hover:bg-slate-700";
+        } else {
+            tlBtn.className = "px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 flex items-center gap-1.5 transition-all hover:bg-slate-700";
+            enBtn.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-black flex items-center gap-1.5 transition-all transform scale-105 shadow-[0_0_12px_rgba(245,158,11,0.6)]";
+        }
+
+        document.getElementById('gameover-banner').innerText = t.gameoverBanner;
+        document.getElementById('gameover-title').innerText = t.gameoverTitle;
+        document.getElementById('blotter-header').innerText = t.blotterHeader;
+        document.getElementById('lbl-blotter-suspect').innerText = t.blotterSuspect;
+        document.getElementById('lbl-blotter-score').innerText = t.blotterScore;
+        document.getElementById('lbl-blotter-bottles').innerText = t.blotterBottles;
+        document.getElementById('lbl-blotter-cause').innerText = t.blotterCause;
+        document.getElementById('lbl-blotter-title').innerText = t.blotterTitle;
+        document.getElementById('blotter-footer-quote').innerText = t.blotterFooter;
+        document.getElementById('btn-retry').innerText = t.retryBtn;
+        document.getElementById('btn-leaderboard-open').innerText = t.leaderboardBtn;
+
+        document.getElementById('leaderboard-heading').innerText = t.leaderboardHeading;
+        document.getElementById('btn-leaderboard-close').innerText = t.closeBtn;
+
+        if (t.levels && t.levels[currentLevelIdx]) {
+            document.getElementById('level-badge').innerText = t.levels[currentLevelIdx].name;
+        }
+
+        const p = Storage.getPlayer();
+        document.getElementById('player-title-display').innerText = computeRankTitle(p.highScore, p.lifetimeBottles);
+    }
+
+    // Attach to window so onclick inline handlers never fail
+    window.setLanguage = setLanguage;
+    window.toggleLanguage = toggleLanguage;
+
+    /* ==========================================================================
+       4. SYNTHESIZED WEB AUDIO API SOUND SYSTEM & 4-LEVEL CHIPTUNE SEQUENCER
+       ========================================================================== */
+    const SoundFX = {
+        ctx: null,
+        bgmMuted: false,
+        bgmInterval: null,
+        stepIndex: 0,
+        // 4 Distinct Level Chiptune Tracks (Lead Melody + Bassline + Tempo)
+        tracks: [
+            // LVL 1: Alicia Sari-Sari Bounce (Upbeat Tropical Major)
+            {
+                tempo: 135,
+                lead: [523.25, 659.25, 783.99, 659.25, 880.00, 783.99, 659.25, 523.25, 587.33, 698.46, 880.00, 698.46, 783.99, 659.25, 587.33, 523.25],
+                bass: [130.81, 130.81, 196.00, 196.00, 220.00, 220.00, 196.00, 196.00, 146.83, 146.83, 220.00, 220.00, 196.00, 196.00, 130.81, 196.00],
+                wave: 'square'
+            },
+            // LVL 2: Ilagan Tanod Curfew Patrol (Sneaky Minor Groove)
+            {
+                tempo: 120,
+                lead: [440.00, 0, 523.25, 440.00, 659.25, 0, 587.33, 523.25, 493.88, 0, 587.33, 493.88, 659.25, 523.25, 440.00, 0],
+                bass: [110.00, 164.81, 110.00, 164.81, 130.81, 196.00, 130.81, 196.00, 123.47, 185.00, 123.47, 185.00, 110.00, 130.81, 110.00, 110.00],
+                wave: 'sawtooth'
+            },
+            // LVL 3: Cauayan Highway Tricycle Rush (Fast Driving Euro-Arcade)
+            {
+                tempo: 95,
+                lead: [659.25, 659.25, 783.99, 659.25, 987.77, 880.00, 783.99, 659.25, 698.46, 698.46, 880.00, 698.46, 1046.50, 987.77, 880.00, 783.99],
+                bass: [164.81, 329.63, 164.81, 329.63, 196.00, 392.00, 196.00, 392.00, 174.61, 349.23, 174.61, 349.23, 220.00, 440.00, 196.00, 392.00],
+                wave: 'square'
+            },
+            // LVL 4: Roxas Marites Tribunal Boss Fight (Frantic Phrygian Bullet-Hell)
+            {
+                tempo: 82,
+                lead: [587.33, 622.25, 587.33, 440.00, 587.33, 622.25, 698.46, 622.25, 783.99, 698.46, 622.25, 587.33, 523.25, 493.88, 440.00, 392.00],
+                bass: [146.83, 293.66, 155.56, 311.13, 146.83, 293.66, 174.61, 349.23, 196.00, 392.00, 174.61, 349.23, 146.83, 293.66, 110.00, 220.00],
+                wave: 'sawtooth'
+            }
+        ],
+        init() {
+            if (!this.ctx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === 'suspended') {
+                this.ctx.resume();
+            }
+        },
+        startMusic() {
+            this.init();
+            this.stopMusic();
+            this.stepIndex = 0;
+            this.scheduleNextStep();
+        },
+        stopMusic() {
+            if (this.bgmInterval) {
+                clearTimeout(this.bgmInterval);
+                this.bgmInterval = null;
+            }
+        },
+        scheduleNextStep() {
+            if (state !== 'PLAYING') return;
+            const track = this.tracks[currentLevelIdx] || this.tracks[0];
+            if (!this.bgmMuted && this.ctx) {
+                this.playStep(track, this.stepIndex);
+            }
+            this.stepIndex = (this.stepIndex + 1) % track.lead.length;
+            this.bgmInterval = setTimeout(() => this.scheduleNextStep(), track.tempo);
+        },
+        playStep(track, step) {
+            const now = this.ctx.currentTime;
+            // Drunk pitch bend warble!
+            const drunkDetune = drunkLevel > 35 ? Math.sin(Date.now() / 110) * (drunkLevel * 0.45) : 0;
+
+            // Lead Melody Note
+            const leadFreq = track.lead[step];
+            if (leadFreq > 0) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = track.wave;
+                osc.frequency.setValueAtTime(leadFreq + drunkDetune, now);
+                gain.gain.setValueAtTime(0.065, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + (track.tempo / 1000) * 0.9);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + (track.tempo / 1000));
+            }
+
+            // Bass Note
+            const bassFreq = track.bass[step];
+            if (bassFreq > 0) {
+                const bOsc = this.ctx.createOscillator();
+                const bGain = this.ctx.createGain();
+                bOsc.type = 'triangle';
+                bOsc.frequency.setValueAtTime(bassFreq, now);
+                bGain.gain.setValueAtTime(0.11, now);
+                bGain.gain.exponentialRampToValueAtTime(0.001, now + (track.tempo / 1000) * 0.95);
+                bOsc.connect(bGain);
+                bGain.connect(this.ctx.destination);
+                bOsc.start(now);
+                bOsc.stop(now + (track.tempo / 1000));
+            }
+
+            // 8-Bit Percussion Hi-Hat / Kick on even steps
+            if (step % 2 === 0) {
+                const pOsc = this.ctx.createOscillator();
+                const pGain = this.ctx.createGain();
+                pOsc.type = 'square';
+                pOsc.frequency.setValueAtTime(step % 4 === 0 ? 90 : 1200, now);
+                pOsc.frequency.exponentialRampToValueAtTime(30, now + 0.04);
+                pGain.gain.setValueAtTime(0.04, now);
+                pGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+                pOsc.connect(pGain);
+                pGain.connect(this.ctx.destination);
+                pOsc.start(now);
+                pOsc.stop(now + 0.05);
+            }
+        },
+        playBottleClink() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1400, now);
+            osc.frequency.exponentialRampToValueAtTime(2200, now + 0.08);
+            gain.gain.setValueAtTime(0.35, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        },
+        playHitBonk() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(45, now + 0.2);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        },
+        playBurp() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(110, now);
+            osc.frequency.linearRampToValueAtTime(65, now + 0.35);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        },
+        playJump() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(260, now);
+            osc.frequency.exponentialRampToValueAtTime(620, now + 0.15);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        },
+        playDogBark() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            [0, 0.12].forEach(delay => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(380, now + delay);
+                osc.frequency.exponentialRampToValueAtTime(160, now + delay + 0.08);
+                gain.gain.setValueAtTime(0.35, now + delay);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.08);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now + delay);
+                osc.stop(now + delay + 0.08);
+            });
+        },
+        playPoliceSiren() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.linearRampToValueAtTime(950, now + 0.18);
+            osc.frequency.linearRampToValueAtTime(600, now + 0.36);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.36);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.36);
+        },
+        playTanodWhistle() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            for (let i = 0; i < 2; i++) {
+                const start = now + (i * 0.12);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(2800, start);
+                osc.frequency.linearRampToValueAtTime(2600, start + 0.08);
+                gain.gain.setValueAtTime(0.2, start);
+                gain.gain.exponentialRampToValueAtTime(0.01, start + 0.08);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(start);
+                osc.stop(start + 0.08);
+            }
+        },
+        playTricycleHorn() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            [420, 530].forEach(freq => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.45);
+            });
+        },
+        playGameOverJingle() {
+            if (!this.ctx) return;
+            const notes = [330, 311, 293, 277, 240];
+            notes.forEach((freq, idx) => {
+                const now = this.ctx.currentTime + (idx * 0.15);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            });
+        }
+    };
+
+    function toggleMusic() {
+        SoundFX.init();
+        SoundFX.bgmMuted = !SoundFX.bgmMuted;
+        document.getElementById('bgm-icon').innerText = SoundFX.bgmMuted ? '🔇' : '🎵';
+    }
+    window.toggleMusic = toggleMusic;
+
+    /* ==========================================================================
+       5. CANVAS SETUP & GAME CONSTANTS
+       ========================================================================== */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const cabinet = document.getElementById('game-cabinet');
+
+    function resize() {
+        canvas.width = cabinet.clientWidth;
+        canvas.height = cabinet.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let state = 'MENU';
+    let score = 0;
+    let lives = 3;
+    let bottlesCount = 0;
+    let drunkLevel = 0;
+    let passOutTimer = 0;
+    let dashTimer = 0;
+
+    const monkey = {
+        x: 400,
+        y: 0,
+        groundY: 0,
+        width: 48,
+        height: 52,
+        vx: 0,
+        vy: 0,
+        isGrounded: true,
+        jumpForce: -13.5,
+        gravity: 0.65,
+        baseSpeed: 7.2,
+        facing: 1,
+        walkFrame: 0,
+        isPassedOut: false
+    };
+
+    const enemy = {
+        x: 200,
+        y: 75,
+        width: 64,
+        height: 64,
+        vx: 3,
+        stateTimer: 0,
+        frame: 0,
+        spotlightAngle: 0
+    };
+
+    let items = [];
+    let groundHazards = [];
+    let particles = [];
+    let floatingTexts = [];
+    // Ambient Isabela Fireflies (Alitaptap)
+    const fireflies = Array.from({ length: 18 }, () => ({
+        x: Math.random() * 800,
+        y: 120 + Math.random() * 380,
+        phase: Math.random() * Math.PI * 2,
+        speedX: (Math.random() - 0.5) * 0.6,
+        speedY: (Math.random() - 0.5) * 0.4
+    }));
+
+    const keys = { left: false, right: false, jump: false, dash: false };
+
+    /* ==========================================================================
+       6. ISABELA SCENERY & PROCEDURAL ASSETS
+       ========================================================================== */
+    function drawIsabelaBackground(lvlIdx) {
+        const h = canvas.height;
+        const w = canvas.width;
+        const lvl = LEVELS[lvlIdx];
+
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+        if (lvlIdx === 0) {
+            skyGrad.addColorStop(0, '#2e1065');
+            skyGrad.addColorStop(0.35, '#c2410c');
+            skyGrad.addColorStop(0.7, '#f59e0b');
+            skyGrad.addColorStop(1, '#14532d');
+        } else if (lvlIdx === 1) {
+            skyGrad.addColorStop(0, '#1c1917');
+            skyGrad.addColorStop(0.4, '#7f1d1d');
+            skyGrad.addColorStop(0.75, '#d97706');
+            skyGrad.addColorStop(1, '#064e3b');
+        } else if (lvlIdx === 2) {
+            skyGrad.addColorStop(0, '#0f172a');
+            skyGrad.addColorStop(0.3, '#312e81');
+            skyGrad.addColorStop(0.65, '#0284c7');
+            skyGrad.addColorStop(1, '#065f46');
+        } else {
+            skyGrad.addColorStop(0, '#4a044e');
+            skyGrad.addColorStop(0.35, '#9d174d');
+            skyGrad.addColorStop(0.7, '#ea580c');
+            skyGrad.addColorStop(1, '#166534');
+        }
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Sierra Madre Mountains
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.42);
+        for (let x = 0; x <= w; x += 35) {
+            const peakH = Math.sin(x * 0.012) * 55 + Math.cos(x * 0.025) * 35;
+            ctx.lineTo(x, h * 0.42 - peakH);
+        }
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+        ctx.fill();
+
+        // Foothills
+        ctx.fillStyle = 'rgba(6, 78, 59, 0.45)';
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.56);
+        for (let x = 0; x <= w; x += 40) {
+            const hillH = Math.sin(x * 0.02 + 1) * 35 + Math.sin(x * 0.008) * 20;
+            ctx.lineTo(x, h * 0.56 - hillH);
+        }
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+        ctx.fill();
+
+        // Level-Specific Landmarks
+        if (lvlIdx === 1) {
+            // Tumauini Red-Brick Belfry Tower
+            ctx.fillStyle = '#7f1d1d';
+            ctx.fillRect(w - 140, h - 230, 70, 150);
+            ctx.beginPath();
+            ctx.arc(w - 105, h - 230, 35, Math.PI, 0);
+            ctx.fill();
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(w - 120, h - 200, 14, 28);
+            ctx.fillRect(w - 94, h - 200, 14, 28);
+        } else if (lvlIdx === 2) {
+            // Magat Dam structure
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(40, h - 170, 130, 90);
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(70, h - 210, 25, 40);
+            ctx.fillRect(115, h - 210, 25, 40);
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, h - 130); ctx.lineTo(170, h - 130);
+            ctx.moveTo(40, h - 110); ctx.lineTo(170, h - 110);
+            ctx.stroke();
+        }
+
+        // Corn / Rice Fields
+        const fieldY = h - 130;
+        ctx.fillStyle = lvlIdx === 3 ? '#ca8a04' : '#15803d';
+        for (let x = 0; x < w; x += 18) {
+            const stalkH = 25 + Math.sin(x * 0.5 + Date.now() / 400) * 6;
+            ctx.fillRect(x, fieldY - stalkH, 4, stalkH);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(x + 1, fieldY - stalkH - 4, 3, 5);
+            ctx.fillStyle = lvlIdx === 3 ? '#ca8a04' : '#15803d';
+        }
+
+        // Bahay Kubo
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(30, fieldY - 55, 60, 40);
+        ctx.fillStyle = '#92400e';
+        ctx.beginPath();
+        ctx.moveTo(15, fieldY - 55);
+        ctx.lineTo(60, fieldY - 95);
+        ctx.lineTo(105, fieldY - 55);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(38, fieldY - 15, 6, 25);
+        ctx.strokeRect(76, fieldY - 15, 6, 25);
+
+        // Grazing Kalabaw (Carabao)
+        ctx.fillStyle = '#1e293b';
+        const cbX = w * 0.38;
+        const cbY = fieldY - 22;
+        ctx.fillRect(cbX, cbY, 32, 18);
+        ctx.fillRect(cbX + 28, cbY - 10, 14, 14);
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cbX + 35, cbY - 10, 10, Math.PI * 0.8, Math.PI * 1.8);
+        ctx.stroke();
+        ctx.fillRect(cbX + 4, cbY + 18, 5, 12);
+        ctx.fillRect(cbX + 22, cbY + 18, 5, 12);
+
+        // Pavement Road
+        ctx.fillStyle = '#3f3f46';
+        ctx.fillRect(0, h - 80, w, 80);
+        ctx.fillStyle = '#9a3412';
+        ctx.fillRect(0, h - 85, w, 6);
+        // Road Asphalt Markings
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.45)';
+        for (let rx = 20; rx < w; rx += 90) {
+            ctx.fillRect(rx, h - 42, 42, 4);
+        }
+
+        // Ambient Glowing Fireflies (Alitaptap) in the Valley
+        fireflies.forEach(ff => {
+            ff.x = (ff.x + ff.speedX + w) % w;
+            ff.y += Math.sin(Date.now() / 500 + ff.phase) * 0.3;
+            const glow = 0.35 + Math.sin(Date.now() / 220 + ff.phase) * 0.35;
+            ctx.fillStyle = `rgba(253, 224, 71, ${glow})`;
+            ctx.beginPath();
+            ctx.arc(ff.x, ff.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Overhead Tropical Street Powerlines
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 58);
+        ctx.quadraticCurveTo(w / 2, 86, w, 58);
+        ctx.stroke();
+
+        // Provincial Welcome Banner
+        ctx.fillStyle = '#065f46';
+        ctx.fillRect(w / 2 - 130, 20, 260, 22);
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(w / 2 - 130, 20, 260, 22);
+        ctx.fillStyle = '#fef08a';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText(`WELCOME: ${lvl.bannerTown}`, w / 2, 34);
+        ctx.textAlign = 'left';
+    }
+
+    function drawMonkeySprite(x, y, facing, drunkPct, isPassedOut) {
+        ctx.save();
+        // Ground drop shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(x + monkey.width / 2, monkey.groundY + monkey.height - 2, 20, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.translate(x + monkey.width / 2, y + monkey.height / 2);
+        ctx.scale(facing, 1);
+
+        // 3X LASENGGO FEVER AURA
+        if (drunkPct >= 70 && !isPassedOut) {
+            ctx.fillStyle = `rgba(244, 63, 94, ${0.18 + Math.sin(Date.now() / 80) * 0.1})`;
+            ctx.beginPath();
+            ctx.arc(0, -6, 32, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        if (isPassedOut) {
+            ctx.rotate(Math.PI / 2);
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(-16, -12, 32, 24);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(8, -6, 12, 12);
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, -4, 8, 8);
+            ctx.fillStyle = '#60a5fa';
+            ctx.font = '10px monospace';
+            ctx.fillText('Zzz...', -10, -18 - (Date.now() / 200 % 10));
+            ctx.restore();
+            return;
+        }
+
+        if (drunkPct > 30) {
+            const swayAngle = Math.sin(Date.now() / 150) * (drunkPct / 250);
+            ctx.rotate(swayAngle);
+        }
+
+        // Monkey Body
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(-16, -14, 32, 30);
+        ctx.fillStyle = '#d97706';
+        ctx.fillRect(-10, -6, 20, 20);
+
+        // Head & Ears
+        ctx.fillStyle = '#92400e';
+        ctx.fillRect(-14, -28, 28, 20);
+        // Red Pinoy Bandana / Headband
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(-15, -26, 30, 4);
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(-10, -25, 20, 2);
+
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(-18, -26, 6, 8);
+        ctx.fillRect(12, -26, 6, 8);
+
+        // Muzzle
+        ctx.fillStyle = '#fde68a';
+        ctx.fillRect(-8, -20, 20, 14);
+
+        // Eyes based on drunkenness
+        if (drunkPct >= 70) {
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-2, -20, 6, 6);
+            ctx.fillRect(6, -20, 6, 6);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(2, -8, 6, 8);
+        } else if (drunkPct >= 35) {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-2, -18, 4, 4);
+            ctx.fillRect(6, -18, 4, 4);
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
+            ctx.fillRect(-6, -12, 5, 4);
+            ctx.fillRect(9, -12, 5, 4);
+        } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-2, -19, 5, 5);
+            ctx.fillRect(5, -19, 5, 5);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, -18, 3, 3);
+            ctx.fillRect(7, -18, 3, 3);
+        }
+
+        // Tail
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-16, 6);
+        ctx.quadraticCurveTo(-26, 0 + Math.sin(Date.now() / 150) * 8, -22, -16);
+        ctx.stroke();
+
+        // Legs
+        const legOffset = Math.sin(monkey.walkFrame) * 6;
+        ctx.fillStyle = '#592008';
+        ctx.fillRect(-12, 16, 8, 12 + legOffset);
+        ctx.fillRect(4, 16, 8, 12 - legOffset);
+
+        // Catching Crate
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(-14, -38, 28, 12);
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(-12, -36, 24, 8);
+
+        ctx.restore();
+    }
+
+    function drawGroundHazard(gh) {
+        ctx.save();
+        ctx.translate(gh.x + gh.width / 2, gh.y + gh.height / 2);
+        ctx.scale(gh.vx > 0 ? 1 : -1, 1);
+
+        if (gh.type === 'dog') {
+            // Stray Askal (Aspin dog)
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(-18, -8, 36, 16);
+            // Head & Snout
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(10, -18, 16, 16);
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(22, -14, 8, 8);
+            // Ears
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(8, -24, 6, 8);
+            // Eye & Teeth
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(16, -16, 4, 4);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(20, -8, 4, 4);
+            // Legs running
+            const legWalk = Math.sin(Date.now() / 60) * 8;
+            ctx.fillStyle = '#92400e';
+            ctx.fillRect(-14, 8, 6, 12 + legWalk);
+            ctx.fillRect(10, 8, 6, 12 - legWalk);
+            // Tail
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(-18, -4);
+            ctx.quadraticCurveTo(-26, -14 + Math.sin(Date.now() / 50) * 6, -22, -20);
+            ctx.stroke();
+
+        } else if (gh.type === 'adik') {
+            // Shady Street Addict / Drifter in sando (tank top)
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(-12, -16, 24, 28);
+            // Skinny limbs
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(-8, -32, 16, 16);
+            // Sunken red eyes
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-4, -28, 4, 3);
+            ctx.fillRect(4, -28, 4, 3);
+            // Messy hair
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-10, -36, 20, 7);
+            // Shorts
+            ctx.fillStyle = '#b91c1c';
+            ctx.fillRect(-10, 12, 20, 14);
+            // Erratic arms lunging
+            const armLunge = Math.sin(Date.now() / 90) * 10;
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(10, -10 + armLunge, 14, 5);
+
+        } else if (gh.type === 'police') {
+            // PNP Patrol Police with Cap, Uniform & Baton
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(-14, -18, 28, 30);
+            // Belt & Badge
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-14, 6, 28, 5);
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-3, -8, 6, 6);
+            // Head & PNP Cap
+            ctx.fillStyle = '#fbcfe8';
+            ctx.fillRect(-9, -32, 18, 14);
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(-12, -38, 24, 8);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(-6, -38, 12, 3);
+            // Pants & Boots
+            ctx.fillStyle = '#172554';
+            ctx.fillRect(-12, 12, 10, 18);
+            ctx.fillRect(2, 12, 10, 18);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-14, 28, 12, 6);
+            ctx.fillRect(2, 28, 12, 6);
+            // Baton
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(12, -6, 6, 26);
+        }
+
+        ctx.restore();
+    }
+
+    function drawEnemySprite(en, lvlIdx) {
+        ctx.save();
+        ctx.translate(en.x + en.width / 2, en.y + en.height / 2);
+        const lvl = LEVELS[lvlIdx];
+
+        if (lvl.enemyType === 'tessie') {
+            ctx.fillStyle = '#065f46';
+            ctx.fillRect(-38, -36, 76, 72);
+            ctx.fillStyle = '#022c22';
+            ctx.fillRect(-34, -32, 68, 64);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(-18, -4, 36, 32);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(-12, 2, 4, 4);
+            ctx.fillRect(6, 12, 4, 4);
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(-14, -24, 28, 22);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(-16, -30, 8, 8);
+            ctx.fillRect(8, -30, 8, 8);
+            ctx.fillStyle = '#ec4899';
+            ctx.fillRect(-6, -32, 12, 8);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-12, -18, 8, 6);
+            ctx.strokeRect(4, -18, 8, 6);
+            ctx.fillStyle = '#881337';
+            ctx.fillRect(-4, -8, 8, 6);
+
+        } else if (lvl.enemyType === 'tanod') {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-18, -10, 36, 38);
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(-14, -6, 28, 30);
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(-14, 4, 28, 6);
+            ctx.fillStyle = '#fdba74';
+            ctx.fillRect(-14, -26, 28, 20);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(-16, -32, 32, 8);
+            ctx.fillRect(-8, -12, 16, 5);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(6, -11, 8, 3);
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(16, 4, 18, 8);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(34, 2, 4, 12);
+
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = 'rgba(254, 240, 138, 0.16)';
+            ctx.beginPath();
+            ctx.moveTo(en.x + en.width, en.y + en.height / 2);
+            ctx.lineTo(en.x + en.width + 120 + Math.sin(en.spotlightAngle) * 90, canvas.height - 40);
+            ctx.lineTo(en.x + en.width - 60 + Math.sin(en.spotlightAngle) * 90, canvas.height - 40);
+            ctx.closePath();
+            ctx.fill();
+            return;
+
+        } else if (lvl.enemyType === 'tricycle') {
+            ctx.fillStyle = '#15803d';
+            ctx.fillRect(-34, -12, 68, 34);
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(-30, 4, 60, 4);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(-24, -22, 48, 10);
+            ctx.fillStyle = '#000';
+            ctx.font = '6px monospace';
+            ctx.fillText('GOD PILOT', -18, -15);
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(-22, 24, 10, 0, Math.PI * 2);
+            ctx.arc(22, 24, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(-6, -30, 16, 18);
+            ctx.fillStyle = '#fdba74';
+            ctx.fillRect(-4, -36, 12, 10);
+
+        } else {
+            [-22, 0, 22].forEach((offset, idx) => {
+                ctx.fillStyle = '#dc2626';
+                ctx.fillRect(offset - 8, 4, 16, 22);
+                ctx.fillStyle = '#fed7aa';
+                ctx.fillRect(offset - 6, -18, 12, 12);
+                ctx.fillStyle = idx === 1 ? '#475569' : '#831843';
+                ctx.fillRect(offset - 8, -24, 16, 8);
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(offset + 6, -8 + Math.sin(Date.now() / 100 + idx) * 4, 8, 8);
+            });
+        }
+
+        ctx.restore();
+    }
+
+    function drawItem(it) {
+        ctx.save();
+        ctx.translate(it.x + it.width / 2, it.y + it.height / 2);
+        ctx.rotate(it.rotation);
+
+        if (it.type === 'bottle') {
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(-8, -12, 16, 24);
+            ctx.fillStyle = '#b45309';
+            ctx.fillRect(-4, -22, 8, 10);
+            ctx.fillStyle = '#fde68a';
+            ctx.fillRect(-3, -25, 6, 4);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(-6, -6, 12, 12);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-4, -2, 8, 4);
+
+        } else if (it.type === 'pandesal') {
+            ctx.fillStyle = '#b45309';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 12, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fef3c7';
+            ctx.fillRect(-6, -4, 3, 3);
+            ctx.fillRect(3, 2, 3, 3);
+
+        } else if (it.type === 'san_mig_bottle') {
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(-6, -10, 12, 20);
+            ctx.fillRect(-3, -18, 6, 8);
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(-4, -4, 8, 8);
+
+        } else if (it.type === 'sparkplug') {
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(-4, -12, 8, 24);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(-6, -4, 12, 8);
+
+        } else if (it.type === 'rccola' || it.type === 'candy') {
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(-7, -10, 14, 20);
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(-5, -4, 10, 8);
+
+        } else {
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 14, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = '8px monospace';
+            ctx.fillText('CHISMIS', -12, 3);
+        }
+
+        ctx.restore();
+    }
+
+    /* ==========================================================================
+       7. CONTROLS, SPAWN & PARTICLES
+       ========================================================================== */
+    window.addEventListener('keydown', (e) => {
+        SoundFX.init();
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.jump = true;
+        if (e.key === ' ' || e.key === 'Shift') keys.dash = true;
+    });
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+        if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+        if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.jump = false;
+        if (e.key === ' ' || e.key === 'Shift') keys.dash = false;
+    });
+
+    const touchLeft = document.getElementById('touch-left');
+    const touchRight = document.getElementById('touch-right');
+    const touchJump = document.getElementById('touch-jump');
+    const touchDash = document.getElementById('touch-dash');
+
+    function bindTouch(elem, keyName) {
+        if (!elem) return;
+        elem.addEventListener('touchstart', (e) => { e.preventDefault(); SoundFX.init(); keys[keyName] = true; });
+        elem.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+    }
+    bindTouch(touchLeft, 'left');
+    bindTouch(touchRight, 'right');
+    bindTouch(touchJump, 'jump');
+    bindTouch(touchDash, 'dash');
+
+    let spawnCooldown = 0;
+    let groundHazardCooldown = 120;
+
+    function spawnGroundHazard() {
+        const types = ['dog', 'adik', 'police'];
+        let chosenType = types[Math.floor(Math.random() * Math.min(types.length, currentLevelIdx + 1))];
+
+        const fromLeft = Math.random() < 0.5;
+        let speed = 3.2 + Math.random() * 2.2 + (currentLevelIdx * 0.6);
+        if (chosenType === 'dog') {
+            speed *= 1.35;
+            SoundFX.playDogBark();
+        } else if (chosenType === 'police') {
+            SoundFX.playPoliceSiren();
+        }
+
+        const hWidth = chosenType === 'dog' ? 44 : 36;
+        const hHeight = chosenType === 'dog' ? 28 : 50;
+
+        groundHazards.push({
+            type: chosenType,
+            x: fromLeft ? -60 : canvas.width + 60,
+            y: canvas.height - 80 - hHeight,
+            width: hWidth,
+            height: hHeight,
+            vx: fromLeft ? speed : -speed,
+            animFrame: 0
+        });
+
+        const shout = chosenType === 'dog' ? 'AW AW AW! 🐕' : chosenType === 'adik' ? 'PENGE PISO! 🧟' : 'CHECKPOINT! 👮';
+        addFloatingText(shout, fromLeft ? 80 : canvas.width - 120, canvas.height - 130, chosenType === 'dog' ? '#f59e0b' : chosenType === 'adik' ? '#f43f5e' : '#38bdf8');
+    }
+
+    function spawnDrop() {
+        const currentLvl = LEVELS[currentLevelIdx];
+        const isBottle = Math.random() < 0.45;
+        let type = 'bottle';
+
+        if (!isBottle) {
+            const trashPool = currentLvl.trashItems;
+            type = trashPool[Math.floor(Math.random() * trashPool.length)];
+        }
+
+        const startX = Math.max(20, Math.min(canvas.width - 50, enemy.x + (Math.random() - 0.5) * 80));
+
+        items.push({
+            x: startX,
+            y: enemy.y + 30,
+            width: 32,
+            height: 32,
+            vx: (Math.random() - 0.5) * 3,
+            vy: 2.8 + Math.random() * 2.5 + (currentLevelIdx * 0.7),
+            type: type,
+            isBottle: isBottle,
+            rotation: Math.random() * Math.PI,
+            rotSpeed: (Math.random() - 0.5) * 0.15
+        });
+    }
+
+    function addFloatingText(text, x, y, color = '#facc15') {
+        floatingTexts.push({ text, x, y, color, alpha: 1.0, vy: -2 });
+    }
+
+    function createSparks(x, y, count = 8, color = '#fef08a') {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 7,
+                vy: (Math.random() - 0.5) * 7,
+                color,
+                size: 2 + Math.random() * 3,
+                life: 25
+            });
+        }
+    }
+
+    /* ==========================================================================
+       8. GAME ENGINE LOOP & STATE MANAGEMENT
+       ========================================================================== */
+    function updateGame() {
+        if (state !== 'PLAYING') return;
+
+        monkey.groundY = canvas.height - 80 - monkey.height;
+
+        if (monkey.isPassedOut) {
+            passOutTimer--;
+            if (passOutTimer <= 0) {
+                monkey.isPassedOut = false;
+                drunkLevel = 45;
+                addFloatingText(I18N[currentLang].wokeUpNotice, monkey.x, monkey.y - 20, '#4ade80');
+            }
+        } else {
+            let moveDir = 0;
+            if (keys.left) moveDir -= 1;
+            if (keys.right) moveDir += 1;
+
+            if (drunkLevel >= 70) {
+                moveDir += Math.sin(Date.now() / 200) * 0.45;
+            }
+
+            let curSpeed = monkey.baseSpeed;
+            if (keys.dash && dashTimer <= 0) {
+                curSpeed *= 1.8;
+                dashTimer = 20;
+                createSparks(monkey.x + monkey.width / 2, monkey.y + monkey.height, 4, '#fb923c');
+            }
+            if (dashTimer > 0) dashTimer--;
+
+            // JUMP LOGIC
+            if (keys.jump && monkey.isGrounded) {
+                monkey.vy = monkey.jumpForce;
+                monkey.isGrounded = false;
+                SoundFX.playJump();
+                createSparks(monkey.x + monkey.width / 2, monkey.y + monkey.height, 5, '#60a5fa');
+            }
+
+            // GRAVITY & VERTICAL MOVEMENT
+            monkey.vy += monkey.gravity;
+            monkey.y += monkey.vy;
+
+            if (monkey.y >= monkey.groundY) {
+                monkey.y = monkey.groundY;
+                monkey.vy = 0;
+                monkey.isGrounded = true;
+            }
+
+            monkey.vx = monkey.vx * 0.75 + (moveDir * curSpeed) * 0.25;
+            monkey.x += monkey.vx;
+
+            if (moveDir !== 0) {
+                monkey.facing = moveDir > 0 ? 1 : -1;
+                monkey.walkFrame += 0.25;
+            }
+
+            monkey.x = Math.max(10, Math.min(canvas.width - monkey.width - 10, monkey.x));
+
+            if (drunkLevel > 0) {
+                drunkLevel = Math.max(0, drunkLevel - 0.025);
+            }
+        }
+
+        enemy.x += enemy.vx;
+        if (enemy.x < 30 || enemy.x > canvas.width - enemy.width - 30) {
+            enemy.vx *= -1;
+        }
+        enemy.spotlightAngle += 0.03;
+        enemy.stateTimer++;
+
+        if (enemy.stateTimer % 240 === 0) {
+            const quotes = I18N[currentLang].levels[currentLevelIdx].quotes;
+            const pick = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('enemy-shout').innerText = `"${pick}"`;
+
+            if (LEVELS[currentLevelIdx].enemyType === 'tanod') SoundFX.playTanodWhistle();
+            if (LEVELS[currentLevelIdx].enemyType === 'tricycle') {
+                SoundFX.playTricycleHorn();
+                cabinet.classList.add('screen-shake');
+                setTimeout(() => cabinet.classList.remove('screen-shake'), 300);
+            }
+        }
+
+        // AERIAL DROP SPAWN
+        spawnCooldown++;
+        const spawnInterval = Math.max(22, 65 - (currentLevelIdx * 10));
+        if (spawnCooldown >= spawnInterval) {
+            spawnDrop();
+            spawnCooldown = 0;
+        }
+
+        // GROUND HAZARD SPAWN
+        groundHazardCooldown--;
+        if (groundHazardCooldown <= 0) {
+            spawnGroundHazard();
+            groundHazardCooldown = Math.max(140, 320 - (currentLevelIdx * 45));
+        }
+
+        // GROUND HAZARDS UPDATE & COLLISION
+        for (let i = groundHazards.length - 1; i >= 0; i--) {
+            const gh = groundHazards[i];
+            gh.x += gh.vx;
+
+            // Check collision with Monkey
+            const monkeyHitbox = {
+                x: monkey.x + 8,
+                y: monkey.y + 6,
+                width: monkey.width - 16,
+                height: monkey.height - 6
+            };
+
+            if (
+                gh.x < monkeyHitbox.x + monkeyHitbox.width &&
+                gh.x + gh.width > monkeyHitbox.x &&
+                gh.y < monkeyHitbox.y + monkeyHitbox.height &&
+                gh.y + gh.height > monkeyHitbox.y
+            ) {
+                lives--;
+                SoundFX.playHitBonk();
+                createSparks(monkey.x + monkey.width / 2, monkey.y + monkey.height / 2, 16, '#dc2626');
+                cabinet.classList.add('screen-shake');
+                setTimeout(() => cabinet.classList.remove('screen-shake'), 300);
+
+                let cause = I18N[currentLang].lossReasons.dogBite;
+                let hitText = "AW-AW! KAGAT!";
+                if (gh.type === 'adik') {
+                    cause = I18N[currentLang].lossReasons.adikAttack;
+                    hitText = "HULIDAP!";
+                } else if (gh.type === 'police') {
+                    cause = I18N[currentLang].lossReasons.policeArrest;
+                    hitText = "HULI KA!";
+                }
+
+                addFloatingText(hitText, monkey.x, monkey.y - 25, '#ef4444');
+                groundHazards.splice(i, 1);
+
+                if (lives <= 0) {
+                    triggerGameOver(cause);
+                    return;
+                }
+                continue;
+            }
+
+            // Remove off-screen hazards
+            if ((gh.vx > 0 && gh.x > canvas.width + 100) || (gh.vx < 0 && gh.x < -100)) {
+                groundHazards.splice(i, 1);
+            }
+        }
+
+        for (let i = items.length - 1; i >= 0; i--) {
+            const it = items[i];
+            it.x += it.vx;
+            it.y += it.vy;
+            it.rotation += it.rotSpeed;
+
+            const catchBox = {
+                x: monkey.x - 4,
+                y: monkey.y - 10,
+                width: monkey.width + 8,
+                height: monkey.height
+            };
+
+            if (
+                it.x < catchBox.x + catchBox.width &&
+                it.x + it.width > catchBox.x &&
+                it.y < catchBox.y + catchBox.height &&
+                it.y + it.height > catchBox.y
+            ) {
+                if (it.isBottle) {
+                    let multiplier = 1;
+                    if (drunkLevel >= 70) multiplier = 3;
+                    else if (drunkLevel >= 30) multiplier = 2;
+
+                    const pts = 100 * multiplier;
+                    score += pts;
+                    bottlesCount++;
+                    drunkLevel = Math.min(100, drunkLevel + 12);
+                    SoundFX.playBottleClink();
+                    createSparks(it.x, it.y, 10, '#fef08a');
+                    addFloatingText(`+₱${pts}!`, it.x, it.y - 10, '#fde047');
+
+                    if (drunkLevel >= 100 && !monkey.isPassedOut) {
+                        monkey.isPassedOut = true;
+                        passOutTimer = 160;
+                        SoundFX.playBurp();
+                        addFloatingText(I18N[currentLang].passedOutNotice, monkey.x - 20, monkey.y - 30, '#ef4444');
+                    } else if (drunkLevel > 60 && Math.random() < 0.25) {
+                        SoundFX.playBurp();
+                    }
+
+                    if (score >= LEVELS[currentLevelIdx].targetScore && currentLevelIdx < LEVELS.length - 1) {
+                        currentLevelIdx++;
+                        addFloatingText(I18N[currentLang].levelUpNotice, canvas.width / 2 - 120, canvas.height / 2, '#4ade80');
+                        document.getElementById('level-badge').innerText = I18N[currentLang].levels[currentLevelIdx].name;
+                    }
+                } else {
+                    lives--;
+                    SoundFX.playHitBonk();
+                    createSparks(it.x, it.y, 14, '#f87171');
+                    cabinet.classList.add('screen-shake');
+                    setTimeout(() => cabinet.classList.remove('screen-shake'), 280);
+
+                    const hitWords = I18N[currentLang].hitWords;
+                    const hitWord = hitWords[Math.floor(Math.random() * hitWords.length)];
+                    addFloatingText(hitWord, it.x, it.y - 15, '#ef4444');
+
+                    if (lives <= 0) {
+                        triggerGameOver(I18N[currentLang].lossReasons.trashHit);
+                        return;
+                    }
+                }
+
+                items.splice(i, 1);
+                continue;
+            }
+
+            if (it.y > canvas.height - 70) {
+                items.splice(i, 1);
+            }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            const ft = floatingTexts[i];
+            ft.y += ft.vy;
+            ft.alpha -= 0.02;
+            if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+        }
+
+        updateHUD();
+    }
+
+    function updateHUD() {
+        let heartsStr = '';
+        for (let i = 0; i < 3; i++) {
+            heartsStr += i < lives ? '❤️' : '🖤';
+        }
+        document.getElementById('hearts-hud').innerText = heartsStr;
+        document.getElementById('score-hud').innerText = score.toString().padStart(5, '0');
+
+        const fill = document.getElementById('drunk-meter-fill');
+        fill.style.width = `${Math.min(100, drunkLevel)}%`;
+        document.getElementById('drunk-percent').innerText = `${(drunkLevel * 0.035).toFixed(2)}‰ BAC`;
+
+        const statusTitle = document.getElementById('drunk-status-title');
+        const multiTag = document.getElementById('multiplier-tag');
+        const t = I18N[currentLang];
+
+        if (drunkLevel >= 70) {
+            statusTitle.innerText = t.drunk;
+            statusTitle.className = "text-rose-400 font-bold animate-pulse";
+            multiTag.classList.remove('hidden');
+            multiTag.innerText = "3X";
+            cabinet.style.setProperty('--drunk-deg', `${(drunkLevel - 50) * 2}`);
+            cabinet.style.setProperty('--drunk-scale', `0.02`);
+        } else if (drunkLevel >= 30) {
+            statusTitle.innerText = t.tipsy;
+            statusTitle.className = "text-amber-400 font-bold";
+            multiTag.classList.remove('hidden');
+            multiTag.innerText = "2X";
+            cabinet.style.setProperty('--drunk-deg', `${(drunkLevel - 20) * 1.2}`);
+            cabinet.style.setProperty('--drunk-scale', `0.01`);
+        } else {
+            statusTitle.innerText = t.sober;
+            statusTitle.className = "text-green-400 font-bold";
+            multiTag.classList.add('hidden');
+            cabinet.style.setProperty('--drunk-deg', `0`);
+            cabinet.style.setProperty('--drunk-scale', `0`);
+        }
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawIsabelaBackground(currentLevelIdx);
+        drawEnemySprite(enemy, currentLevelIdx);
+        items.forEach(drawItem);
+        groundHazards.forEach(drawGroundHazard);
+        drawMonkeySprite(monkey.x, monkey.y, monkey.facing, drunkLevel, monkey.isPassedOut);
+
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+
+        floatingTexts.forEach(ft => {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, ft.alpha);
+            ctx.fillStyle = ft.color;
+            ctx.font = '10px "Press Start 2P"';
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 4;
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+        });
+
+        requestAnimationFrame(() => {
+            updateGame();
+            render();
+        });
+    }
+
+    function triggerGameOver(reason) {
+        state = 'GAMEOVER';
+        SoundFX.stopMusic();
+        SoundFX.playGameOverJingle();
+
+        const player = Storage.getPlayer();
+        const earnedTitle = computeRankTitle(score, bottlesCount);
+
+        if (score > player.highScore) {
+            player.highScore = score;
+            player.title = earnedTitle;
+        }
+        player.lifetimeBottles += bottlesCount;
+        Storage.savePlayer(player);
+
+        Storage.recordScore(player.name, score, earnedTitle);
+
+        document.getElementById('blotter-name').innerText = player.name.toUpperCase();
+        document.getElementById('blotter-score').innerText = `₱${score.toString().padStart(5, '0')}`;
+        document.getElementById('blotter-bottles').innerText = `${bottlesCount} ${currentLang === 'tl' ? 'Bote' : 'Bottles'}`;
+        document.getElementById('blotter-cause').innerText = reason;
+        document.getElementById('blotter-title').innerText = earnedTitle;
+
+        document.getElementById('modal-gameover').classList.remove('hidden');
+    }
+
+    function launchGame() {
+        SoundFX.init();
+        document.getElementById('modal-start').classList.add('hidden');
+        document.getElementById('modal-gameover').classList.add('hidden');
+        document.getElementById('modal-leaderboard').classList.add('hidden');
+
+        score = 0;
+        lives = 3;
+        bottlesCount = 0;
+        drunkLevel = 0;
+        currentLevelIdx = 0;
+        items = [];
+        groundHazards = [];
+        particles = [];
+        floatingTexts = [];
+        monkey.isPassedOut = false;
+        monkey.isGrounded = true;
+        monkey.vy = 0;
+        monkey.x = canvas.width / 2;
+        monkey.y = canvas.height - 80 - monkey.height;
+        groundHazardCooldown = 120;
+
+        document.getElementById('level-badge').innerText = I18N[currentLang].levels[0].name;
+        document.getElementById('enemy-shout').innerText = `"${I18N[currentLang].levels[0].quotes[0]}"`;
+
+        state = 'PLAYING';
+        SoundFX.startMusic();
+    }
+
+    function savePlayerName() {
+        const input = document.getElementById('player-name-input');
+        const val = input.value.trim() || 'Tito Boy';
+        const player = Storage.getPlayer();
+        player.name = val;
+        Storage.savePlayer(player);
+        refreshStartScreenData();
+    }
+
+    function refreshStartScreenData() {
+        const player = Storage.getPlayer();
+        document.getElementById('player-name-input').value = player.name;
+        document.getElementById('player-highscore-display').innerText = `₱${player.highScore}`;
+        document.getElementById('player-title-display').innerText = computeRankTitle(player.highScore, player.lifetimeBottles);
+    }
+
+    function toggleLeaderboard() {
+        const modal = document.getElementById('modal-leaderboard');
+        if (modal.classList.contains('hidden')) {
+            const list = Storage.getLeaderboard();
+            const container = document.getElementById('leaderboard-list');
+            container.innerHTML = list.map((item, idx) => `
+                <div class="flex justify-between items-center py-1 border-b border-slate-800">
+                    <span class="text-amber-400 font-bold">${idx + 1}. ${item.name}</span>
+                    <span class="text-slate-400 text-[9px]">${item.title}</span>
+                    <span class="text-yellow-300 font-bold">₱${item.score}</span>
+                </div>
+            `).join('');
+            modal.classList.remove('hidden');
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Explicit window binding
+    window.launchGame = launchGame;
+    window.savePlayerName = savePlayerName;
+    window.toggleLeaderboard = toggleLeaderboard;
+
+    // Initialization
+    window.addEventListener('load', () => {
+        const savedLang = Storage.get('user_lang', 'tl');
+        setLanguage(savedLang);
+        refreshStartScreenData();
+        render();
+    });
+</script>
+</body>
+</html>
