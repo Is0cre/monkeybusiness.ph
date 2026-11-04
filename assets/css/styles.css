@@ -1250,6 +1250,135 @@ footer {
 }
 
 /* ==========================================================================
+   Age Gatekeeper Modal
+   ========================================================================== */
+
+body.age-locked {
+  overflow: hidden;
+}
+
+.age-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(5, 5, 4, 0.88);
+  backdrop-filter: blur(22px) saturate(130%);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  opacity: 1;
+  transition: opacity 0.35s var(--ease), visibility 0.35s;
+}
+
+.age-gate.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.age-card {
+  width: 100%;
+  max-width: 460px;
+  background: linear-gradient(165deg, rgba(24, 21, 16, 0.98) 0%, rgba(10, 9, 8, 0.99) 100%);
+  border: 1px solid var(--gold-border-strong);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.75rem, 5vw, 2.5rem) clamp(1.5rem, 4vw, 2.25rem);
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 40px rgba(212, 175, 55, 0.12);
+  position: relative;
+}
+
+.age-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.age-cookie-notice {
+  margin-top: 1.25rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+.cookie-text {
+  font-size: 0.75rem !important;
+  color: var(--muted) !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+.age-seal {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto 1.25rem;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75));
+}
+
+.age-card .tagline {
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.age-card .tagline::after {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.7;
+}
+
+.age-card h2 {
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  margin-bottom: 0.85rem;
+}
+
+.age-card p {
+  color: var(--text-soft);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  margin: 0 auto 1.85rem;
+  max-width: 24rem;
+}
+
+.age-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.age-actions .cta {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+}
+
+.age-note {
+  margin-top: 1.5rem !important;
+  margin-bottom: 0 !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted) !important;
+}
+
+.age-denied {
+  color: var(--gold-light) !important;
+  font-weight: 500;
+  margin-bottom: 0.5rem !important;
+}
+
+@media (max-width: 420px) {
+  .age-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
    Scroll Reveal Animations
    ========================================================================== */
 
