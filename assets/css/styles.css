@@ -952,6 +952,11 @@ a.flavor:hover .soon::after {
   display: block;
 }
 
+.valley-frame .shot {
+  border: none;
+  box-shadow: none;
+}
+
 .valley-caption {
   position: absolute;
   bottom: 0;
