@@ -200,6 +200,42 @@ nav#site-nav > a[aria-current="page"]::after,
   transform-origin: left;
 }
 
+/* Arcade game link pill */
+.nav-game {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  padding: 0.35rem 0.85rem !important;
+  border-radius: 999px !important;
+  background: rgba(212, 175, 55, 0.08) !important;
+  border: 1px solid var(--gold-border-strong) !important;
+  color: var(--gold-light) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.15) !important;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease) !important;
+}
+
+.nav-game::after {
+  display: none !important;
+}
+
+.nav-game .game-icon {
+  display: inline-block;
+  font-size: 0.85rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
+}
+
+.nav-game:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(170, 124, 17, 0.35)) !important;
+  border-color: var(--gold) !important;
+  color: #fff !important;
+  transform: translateY(-1px) scale(1.03) !important;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4) !important;
+}
+
 .drop {
   position: relative;
 }
@@ -1190,6 +1226,188 @@ button.cta {
 }
 
 /* ==========================================================================
+   Mara Spotlight & Technical Workbench
+   ========================================================================== */
+
+.mara-spotlight {
+  padding-top: clamp(4rem, 6vw, 6rem);
+  padding-bottom: clamp(3rem, 5vw, 5rem);
+}
+
+.mara-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.mara-frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--gold-border-strong);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(212, 175, 55, 0.12);
+}
+
+.mara-shot {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center 16%;
+  display: block;
+}
+
+.mara-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.2rem 1.4rem 1rem;
+  background: linear-gradient(0deg, rgba(7, 7, 6, 0.95) 0%, transparent 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.mara-title {
+  font-size: clamp(2rem, 3.8vw, 3.1rem);
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}
+
+.mara-role {
+  display: inline-block;
+  font-size: clamp(0.92rem, 0.86rem + 0.3vw, 1.08rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+.story-paragraphs {
+  display: grid;
+  gap: 1.15rem;
+  color: var(--text-soft);
+  font-size: clamp(1rem, 0.96rem + 0.25vw, 1.12rem);
+  line-height: 1.75;
+}
+
+.story-paragraphs p:first-of-type {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Workbench Technical Note */
+.workbench-section {
+  padding-top: clamp(2.5rem, 4vw, 4rem);
+  padding-bottom: clamp(3.5rem, 5vw, 5.5rem);
+}
+
+.workbench-card {
+  background: linear-gradient(165deg, rgba(20, 18, 14, 0.88) 0%, rgba(11, 10, 8, 0.94) 100%);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.workbench-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.workbench-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.workbench-card h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.4rem, 2.4vw, 1.95rem);
+  color: var(--gold-light);
+  margin-bottom: 1.25rem;
+}
+
+.workbench-body {
+  display: grid;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: clamp(0.92rem, 0.88rem + 0.15vw, 1rem);
+  line-height: 1.7;
+  max-width: 58rem;
+}
+
+.workbench-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+.wb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+}
+
+/* Footer Runes & Details */
+.footer-runes {
+  font-family: serif;
+  font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  opacity: 0.85;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.footer-manifesto {
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .mara-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .mara-frame {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+/* ==========================================================================
    Footer
    ========================================================================== */
 
@@ -1477,6 +1695,16 @@ body.age-locked {
     width: 100%;
     justify-content: space-between;
     border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+  }
+
+  nav#site-nav > a.nav-game {
+    margin-top: 0.5rem;
+    padding: 0.8rem 1rem !important;
+    justify-content: center !important;
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--gold-border-strong) !important;
+    background: rgba(212, 175, 55, 0.12) !important;
+    text-align: center;
   }
 
   nav#site-nav > a::after,

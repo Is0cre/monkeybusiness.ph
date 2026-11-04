@@ -11,13 +11,20 @@
             --pixel-font: 'Press Start 2P', monospace;
             --retro-font: 'VT323', monospace;
         }
-        body {
-            font-family: var(--pixel-font);
-            background-color: #080d07;
+        * {
+            -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
+            -webkit-touch-callout: none;
+        }
+        html, body {
+            font-family: var(--pixel-font);
+            background-color: #080d07;
+            touch-action: none;
+            overscroll-behavior: none;
             overflow: hidden;
+            height: 100dvh;
+            width: 100vw;
         }
         .arcade-font {
             font-family: var(--pixel-font);
@@ -60,186 +67,204 @@
         .screen-shake {
             animation: quake 0.28s cubic-bezier(.36,.07,.19,.97) both;
         }
+        .ctrl-btn-active {
+            transform: scale(0.92);
+            filter: brightness(1.3);
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen text-amber-200">
+<body class="flex flex-col items-center justify-center h-[100dvh] w-screen text-amber-200 p-0 sm:p-2">
 
     <!-- Arcade Frame Container -->
-    <div id="game-cabinet" class="relative w-full max-w-[850px] h-[96vh] max-h-[820px] bg-slate-950 border-4 border-amber-600 rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.25)] flex flex-col overflow-hidden crt">
+    <div id="game-cabinet" class="relative w-full max-w-[850px] h-full sm:h-[96dvh] max-h-[900px] bg-slate-950 sm:border-4 border-amber-600 sm:rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.25)] flex flex-col overflow-hidden crt">
         
         <!-- Header HUD -->
-        <div id="hud-bar" class="absolute top-0 left-0 w-full z-20 px-3 py-2 bg-gradient-to-b from-black/90 via-black/60 to-transparent flex justify-between items-start pointer-events-none text-[10px] md:text-xs">
+        <div id="hud-bar" class="absolute top-0 left-0 w-full z-20 px-2.5 py-2 bg-gradient-to-b from-black/95 via-black/70 to-transparent flex justify-between items-start pointer-events-none text-[9px] sm:text-xs">
             <!-- Left: Lives & Score -->
-            <div class="flex flex-col gap-1.5 pointer-events-auto">
-                <div class="flex items-center gap-1.5 bg-black/70 px-2.5 py-1 rounded-lg border border-red-500/40">
+            <div class="flex flex-col gap-1 pointer-events-auto">
+                <div class="flex items-center gap-1 bg-black/80 px-2 py-1 rounded-lg border border-red-500/40">
                     <span id="label-lives" class="text-red-400">BUHAY:</span>
-                    <span id="hearts-hud" class="tracking-widest text-sm">❤️❤️❤️</span>
+                    <span id="hearts-hud" class="tracking-widest text-xs sm:text-sm">❤️❤️❤️</span>
                 </div>
-                <div class="bg-black/70 px-2.5 py-1 rounded-lg border border-amber-500/40 flex items-center gap-2">
+                <div class="bg-black/80 px-2 py-1 rounded-lg border border-amber-500/40 flex items-center gap-1.5">
                     <span id="label-score" class="text-amber-400">₱ESOS:</span>
-                    <span id="score-hud" class="text-yellow-300 text-sm">00000</span>
+                    <span id="score-hud" class="text-yellow-300 text-xs sm:text-sm">00000</span>
                 </div>
             </div>
 
             <!-- Center: Level & Enemy Shout -->
-        <div class="flex flex-col items-center">
-            <div id="level-badge" class="bg-amber-600 text-black px-2.5 py-0.5 rounded font-black tracking-wider text-[10px] uppercase shadow">
-                LVL 1: ALING TESSIE (ALICIA)
+            <div class="flex flex-col items-center max-w-[44%]">
+                <div id="level-badge" class="bg-amber-600 text-black px-2 py-0.5 rounded font-black tracking-wider text-[8px] sm:text-[10px] uppercase shadow truncate max-w-full">
+                    LVL 1: ALING TESSIE (ALICIA)
+                </div>
+                <div id="enemy-shout" class="dialogue-font text-base sm:text-xl text-yellow-300 font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-center leading-tight">
+                    "WALANG UTANG DITO!"
+                </div>
             </div>
-            <div id="enemy-shout" class="dialogue-font text-lg md:text-xl text-yellow-300 font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-center animate-pulse">
-                "WALANG UTANG DITO!"
+
+            <!-- Right: Drunk-o-Meter & Language Switcher -->
+            <div class="flex flex-col items-end gap-1 pointer-events-auto">
+                <!-- Flag Language & Music Toggle Buttons -->
+                <div class="flex items-center gap-1.5">
+                    <button id="bgm-toggle-btn" onclick="toggleMusic()" class="bg-slate-900/90 border border-amber-400/60 active:bg-slate-700 text-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer shadow-md flex items-center" title="Toggle Chiptune Music">
+                        <span id="bgm-icon">🎵</span>
+                    </button>
+                    <button id="lang-toggle-btn" onclick="toggleLanguage()" class="bg-emerald-950/90 border border-emerald-400/60 active:bg-emerald-800 text-emerald-300 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider cursor-pointer shadow-md flex items-center gap-1">
+                        <span id="lang-flag-hud" class="text-sm">🇵🇭</span>
+                        <span id="lang-label" class="text-[8px] hidden sm:inline">TAGALOG</span>
+                    </button>
+                </div>
+                <div class="bg-black/80 px-2 py-0.5 rounded border border-purple-500/40 text-[8px] sm:text-[9px] flex items-center gap-1">
+                    <span id="drunk-status-title" class="text-green-400 font-bold">SOBER</span>
+                    <span id="multiplier-tag" class="text-[9px] bg-amber-500 text-black px-1 rounded font-bold hidden">2X</span>
+                </div>
+                <div class="w-24 sm:w-36 h-3 bg-slate-900 rounded-full border border-purple-500/50 p-0.5 overflow-hidden">
+                    <div id="drunk-meter-fill" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-600 transition-all duration-200" style="width: 0%;"></div>
+                </div>
+                <span id="drunk-percent" class="text-[8px] text-purple-300 font-mono">0.00‰ BAC</span>
             </div>
         </div>
 
-        <!-- Right: Drunk-o-Meter & Language Switcher -->
-        <div class="flex flex-col items-end gap-1.5 pointer-events-auto">
-            <!-- Flag Language & Music Toggle Buttons -->
-            <div class="flex items-center gap-1.5">
-                <button id="bgm-toggle-btn" onclick="toggleMusic()" class="bg-slate-900/90 border border-amber-400/60 hover:bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer shadow-md transition-transform active:scale-95 flex items-center gap-1" title="Toggle Chiptune Music">
-                    <span id="bgm-icon">🎵</span>
+        <!-- Canvas Play Area (Supports direct touch slide & swipe!) -->
+        <div id="canvas-wrapper" class="relative w-full flex-grow overflow-hidden">
+            <canvas id="gameCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+            <!-- Subtle mobile touch hint toast -->
+            <div id="touch-hint-pill" class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/65 border border-amber-500/30 text-amber-200/80 px-3 py-1 rounded-full text-[8px] pointer-events-none whitespace-nowrap">
+                📱 DRAG SCREEN OR USE ARCADE PAD BELOW • SWIPE UP TO JUMP
+            </div>
+        </div>
+
+        <!-- Dedicated Mobile-First Ergonomic Arcade Control Deck (Never blocks the road!) -->
+        <div id="mobile-controls" class="w-full bg-slate-950 border-t-4 border-amber-600/80 px-3 py-2.5 flex justify-between items-center z-20 select-none shrink-0 shadow-[0_-10px_25px_rgba(0,0,0,0.8)]">
+            <!-- Left D-Pad Thumb Zone -->
+            <div class="flex gap-2.5 items-center">
+                <button id="touch-left" aria-label="Move Left" class="w-20 h-16 sm:w-24 sm:h-16 bg-gradient-to-b from-slate-800 to-slate-900 active:from-amber-500 active:to-amber-600 border-2 border-b-4 border-amber-500/70 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl text-amber-300 active:text-black shadow-lg transition-all">
+                    ◀
                 </button>
-                <button id="lang-toggle-btn" onclick="toggleLanguage()" class="bg-emerald-950/90 border border-emerald-400/60 hover:bg-emerald-800 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider cursor-pointer shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
-                    <span id="lang-flag-hud" class="text-sm">🇵🇭</span>
-                    <span id="lang-label" class="text-[8px]">TAGALOG</span>
+                <button id="touch-right" aria-label="Move Right" class="w-20 h-16 sm:w-24 sm:h-16 bg-gradient-to-b from-slate-800 to-slate-900 active:from-amber-500 active:to-amber-600 border-2 border-b-4 border-amber-500/70 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl text-amber-300 active:text-black shadow-lg transition-all">
+                    ▶
                 </button>
             </div>
-            <div class="bg-black/70 px-2 py-0.5 rounded border border-purple-500/40 text-[9px] flex items-center gap-1">
-                <span id="drunk-status-title" class="text-green-400 font-bold">SOBER</span>
-                <span id="multiplier-tag" class="text-xs bg-amber-500 text-black px-1 rounded font-bold hidden">2X</span>
+
+            <!-- Center Mini Label (Hidden on very narrow screens) -->
+            <div class="hidden sm:flex flex-col items-center text-[8px] text-slate-500 tracking-widest">
+                <span>ISABELA ARCADE</span>
+                <span class="text-amber-500/70">TOUCH DECK</span>
             </div>
-            <div class="w-28 md:w-36 h-3.5 bg-slate-900 rounded-full border border-purple-500/50 p-0.5 overflow-hidden">
-                <div id="drunk-meter-fill" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-600 transition-all duration-200" style="width: 0%;"></div>
+
+            <!-- Right Action Thumb Zone (Big Jump + Dash) -->
+            <div class="flex gap-2.5 items-center">
+                <button id="touch-dash" aria-label="Dash" class="w-16 h-16 sm:w-20 sm:h-16 bg-gradient-to-b from-rose-900 to-rose-950 active:from-rose-500 active:to-rose-600 border-2 border-b-4 border-rose-500/80 rounded-2xl flex flex-col items-center justify-center text-rose-200 active:text-black shadow-lg transition-all">
+                    <span class="text-lg sm:text-xl leading-none">⚡</span>
+                    <span id="lbl-btn-dash" class="text-[8px] font-black mt-1 tracking-wider">DASH</span>
+                </button>
+                <button id="touch-jump" aria-label="Jump" class="w-24 h-16 sm:w-28 sm:h-16 bg-gradient-to-b from-emerald-600 to-emerald-800 active:from-emerald-400 active:to-emerald-500 border-2 border-b-4 border-emerald-300 rounded-2xl flex flex-col items-center justify-center text-black shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all">
+                    <span class="text-xl sm:text-2xl leading-none">🦘</span>
+                    <span id="lbl-btn-jump" class="text-[9px] font-black mt-1 tracking-wider">TALON / JUMP</span>
+                </button>
             </div>
-            <span id="drunk-percent" class="text-[9px] text-purple-300 font-mono">0.00‰ BAC</span>
         </div>
-    </div>
 
-    <!-- Canvas -->
-    <canvas id="gameCanvas" class="w-full h-full flex-grow cursor-crosshair"></canvas>
+        <!-- START SCREEN OVERLAY -->
+        <div id="modal-start" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center p-3 sm:p-4 text-center overflow-y-auto">
+            <div id="start-badge" class="text-amber-500 text-[10px] sm:text-sm tracking-widest mb-1 animate-pulse">ISABELA VALLEY SPECIAL • CAGAYAN GRANARY</div>
+            <h1 class="text-xl sm:text-4xl text-amber-400 tracking-wider drop-shadow-[0_4px_0_#92400e] mb-1">MONKEY BUSINESS</h1>
+            <h2 id="start-subtitle" class="text-sm sm:text-lg text-emerald-400 tracking-wider mb-2.5">🍻 BARANGAY RUMBLE 🍻</h2>
 
-    <!-- START SCREEN OVERLAY -->
-    <div id="modal-start" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center p-4 text-center">
-        <div id="start-badge" class="text-amber-500 text-xs md:text-sm tracking-widest mb-1 animate-pulse">ISABELA VALLEY SPECIAL • CAGAYAN GRANARY</div>
-        <h1 class="text-2xl md:text-4xl text-amber-400 tracking-wider drop-shadow-[0_4px_0_#92400e] mb-1">MONKEY BUSINESS</h1>
-        <h2 id="start-subtitle" class="text-base md:text-lg text-emerald-400 tracking-wider mb-3">🍻 BARANGAY RUMBLE 🍻</h2>
+            <!-- Quick Flag Lang Switch in Menu -->
+            <div class="flex items-center gap-2 sm:gap-3 mb-2.5 bg-black/75 px-3 py-1.5 rounded-full border border-amber-500/40 shadow-lg">
+                <button onclick="setLanguage('tl')" id="btn-lang-tl" class="px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold bg-amber-500 text-black flex items-center gap-1.5 transition-all transform scale-105 shadow">
+                    <span class="text-base">🇵🇭</span> <span>TAGALOG</span>
+                </button>
+                <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold bg-slate-800 text-slate-300 flex items-center gap-1.5 transition-all hover:bg-slate-700">
+                    <span class="text-base">🇬🇧</span> <span>ENGLISH</span>
+                </button>
+            </div>
 
-        <!-- Quick Flag Lang Switch in Menu -->
-        <div class="flex items-center gap-3 mb-3 bg-black/75 px-4 py-1.5 rounded-full border border-amber-500/40 shadow-lg">
-            <button onclick="setLanguage('tl')" id="btn-lang-tl" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-black flex items-center gap-1.5 transition-all transform scale-105 shadow">
-                <span class="text-base">🇵🇭</span> <span>TAGALOG</span>
+            <!-- Player Profile Input -->
+            <div class="bg-slate-900/90 border-2 border-amber-600 p-3 sm:p-4 rounded-xl max-w-sm w-full mb-2.5 shadow-xl text-left">
+                <label id="lbl-player-name" class="block text-[9px] sm:text-[10px] text-amber-300 mb-1">PANGALAN NG TSAMPYON (NAME):</label>
+                <div class="flex gap-2 mb-2">
+                    <input id="player-name-input" type="text" maxlength="12" value="Tito Boy" 
+                        class="bg-black text-amber-300 border border-amber-500 px-3 py-2 text-xs rounded uppercase w-full focus:outline-none focus:ring-1 focus:ring-amber-300">
+                    <button id="btn-save-name" onclick="savePlayerName()" class="bg-amber-600 text-black px-4 py-2 text-[10px] font-bold rounded active:bg-amber-400">SET</button>
+                </div>
+                <div class="text-[9px] sm:text-[10px] text-slate-400 flex justify-between">
+                    <span id="lbl-record">RECORD:</span>
+                    <span id="player-highscore-display" class="text-amber-300">₱0</span>
+                </div>
+                <div class="text-[9px] sm:text-[10px] text-slate-400 flex justify-between mt-0.5">
+                    <span id="lbl-rank">RANK:</span>
+                    <span id="player-title-display" class="text-emerald-400">BAGUHAN (ROOKIE)</span>
+                </div>
+            </div>
+
+            <!-- How To Play Quick Guide -->
+            <div id="guide-box" class="text-[8px] sm:text-[10px] text-amber-200/80 max-w-md bg-black/50 p-2.5 sm:p-3 rounded-lg border border-slate-700 mb-3 space-y-1 text-left leading-relaxed">
+            </div>
+
+            <button id="btn-start-game" onclick="launchGame()" class="w-full max-w-xs bg-gradient-to-r from-amber-500 to-orange-600 active:from-amber-400 active:to-orange-500 text-black px-6 py-4 rounded-xl border-b-4 border-amber-900 active:translate-y-1 text-xs sm:text-sm font-black tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.5)]">
+                SUMABAK NA! (START)
             </button>
-            <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 flex items-center gap-1.5 transition-all hover:bg-slate-700">
-                <span class="text-base">🇬🇧</span> <span>ENGLISH</span>
-            </button>
         </div>
 
-        <!-- Player Profile Input -->
-        <div class="bg-slate-900/90 border-2 border-amber-600 p-4 rounded-xl max-w-sm w-full mb-3 shadow-xl text-left">
-            <label id="lbl-player-name" class="block text-[10px] text-amber-300 mb-1">PANGALAN NG TSAMPYON (NAME):</label>
-            <div class="flex gap-2 mb-3">
-                <input id="player-name-input" type="text" maxlength="12" value="Tito Boy" 
-                    class="bg-black text-amber-300 border border-amber-500 px-3 py-1.5 text-xs rounded uppercase w-full focus:outline-none focus:ring-1 focus:ring-amber-300">
-                <button id="btn-save-name" onclick="savePlayerName()" class="bg-amber-600 text-black px-3 py-1 text-[10px] font-bold rounded hover:bg-amber-500">SET</button>
+        <!-- GAME OVER / BARANGAY BLOTTER OVERLAY -->
+        <div id="modal-gameover" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-3 sm:p-4 text-center overflow-y-auto">
+            <div id="gameover-banner" class="text-rose-500 text-[10px] sm:text-xs font-bold tracking-widest mb-1 animate-bounce">
+                ⚠️ OPISYAL NA BLOTTER REPORT NG BARANGAY ⚠️
             </div>
-            <div class="text-[10px] text-slate-400 flex justify-between">
-                <span id="lbl-record">RECORD:</span>
-                <span id="player-highscore-display" class="text-amber-300">₱0</span>
-            </div>
-            <div class="text-[10px] text-slate-400 flex justify-between">
-                <span id="lbl-rank">RANK:</span>
-                <span id="player-title-display" class="text-emerald-400">BAGUHAN (ROOKIE)</span>
-            </div>
-        </div>
+            <h2 id="gameover-title" class="text-lg sm:text-2xl text-amber-400 mb-3">BAGSAK SI GAGONG UNGGOY!</h2>
 
-        <!-- How To Play Quick Guide -->
-        <div id="guide-box" class="text-[9px] md:text-[10px] text-amber-200/80 max-w-md bg-black/50 p-3 rounded-lg border border-slate-700 mb-4 space-y-1 text-left">
-        </div>
-
-        <button id="btn-start-game" onclick="launchGame()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black px-8 py-3.5 rounded-xl border-b-4 border-amber-900 active:translate-y-1 text-xs md:text-sm font-black tracking-widest shadow-[0_0_20px_rgba(245,158,11,0.5)]">
-            SUMABAK NA! (START)
-        </button>
-    </div>
-
-    <!-- GAME OVER / BARANGAY BLOTTER OVERLAY -->
-    <div id="modal-gameover" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-4 text-center">
-        <div id="gameover-banner" class="text-red-500 text-xs tracking-widest mb-1 animate-ping">⚠️ OFFICIAL BARANGAY INCIDENT REPORT ⚠️</div>
-        <h2 id="gameover-title" class="text-2xl md:text-3xl text-rose-500 drop-shadow-[0_3px_0_#4c0519] mb-3">BAGSAK SI GAGONG UNGGOY!</h2>
-
-        <!-- Blotter Card -->
-        <div class="bg-amber-100 text-slate-900 p-4 rounded-lg max-w-sm w-full mb-4 shadow-2xl border-4 border-dashed border-amber-800 text-left relative rotate-[-1deg]">
-            <div id="blotter-header" class="text-[9px] text-center font-bold tracking-widest border-b-2 border-slate-900 pb-1 mb-2">
-                LALAWIGAN NG ISABELA • TANGGAPAN NG BARANGAY
-            </div>
-            <div class="space-y-1 text-[10px]">
+            <div class="bg-amber-100 text-slate-900 border-4 border-amber-700 p-3 sm:p-4 rounded-xl max-w-sm w-full mb-4 shadow-2xl text-left font-mono text-[10px] sm:text-xs space-y-1.5">
+                <div id="blotter-header" class="text-center font-black border-b-2 border-slate-400 pb-1 mb-2 text-rose-900">
+                    LALAWIGAN NG ISABELA • TANGGAPAN NG BARANGAY
+                </div>
                 <div class="flex justify-between">
                     <span id="lbl-blotter-suspect" class="font-bold">SUSPEK:</span>
-                    <span id="blotter-name" class="font-bold underline">TITO BOY</span>
+                    <span id="blotter-name" class="text-rose-700 font-black">TITO BOY</span>
                 </div>
                 <div class="flex justify-between">
                     <span id="lbl-blotter-score" class="font-bold">NAKULIMBAT (SCORE):</span>
-                    <span id="blotter-score" class="font-bold text-amber-900">₱00000</span>
+                    <span id="blotter-score" class="text-emerald-800 font-black">₱00000</span>
                 </div>
                 <div class="flex justify-between">
                     <span id="lbl-blotter-bottles" class="font-bold">NAINOM NA BOTE:</span>
-                    <span id="blotter-bottles" class="font-bold text-emerald-800">0 Bote</span>
+                    <span id="blotter-bottles" class="font-bold">0 Bote</span>
                 </div>
-                <div class="flex justify-between">
-                    <span id="lbl-blotter-cause" class="font-bold">KAHIHITNATNAN:</span>
-                    <span id="blotter-cause" class="font-bold text-rose-800">Dukot sa Palayan</span>
+                <div class="border-t border-slate-300 pt-1">
+                    <span id="lbl-blotter-cause" class="font-bold block">KAHIHITNATNAN:</span>
+                    <span id="blotter-cause" class="text-rose-600 italic block">Tinamaan ng Skrap!</span>
                 </div>
-                <div class="flex justify-between pt-1 border-t border-slate-400">
+                <div class="border-t border-slate-300 pt-1 flex justify-between items-center">
                     <span id="lbl-blotter-title" class="font-bold">BAGONG TITULO:</span>
-                    <span id="blotter-title" class="font-black text-purple-900">BARANGAY LEGEND</span>
+                    <span id="blotter-title" class="bg-amber-400 text-black px-1.5 py-0.5 rounded font-black text-[9px]">ROOKIE</span>
+                </div>
+                <div id="blotter-footer-quote" class="text-[8px] text-slate-600 italic text-center pt-2 border-t border-slate-300">
+                    "Pinatutunayan na ang nasabing unggoy ay nagdulot ng kalasingan sa gitna ng mga palayan ng Isabela."
                 </div>
             </div>
-            <div id="blotter-footer-quote" class="mt-3 text-[8px] text-slate-600 italic text-center">
-                "Pinatutunayan na ang nasabing unggoy ay nagdulot ng kalasingan sa gitna ng palayan ng Isabela."
+
+            <div class="flex gap-3">
+                <button id="btn-retry" onclick="launchGame()" class="bg-emerald-500 hover:bg-emerald-400 text-black px-5 py-3 rounded-xl font-black text-xs border-b-4 border-emerald-800 active:translate-y-1">
+                    ULITIN! (RETRY)
+                </button>
+                <button id="btn-leaderboard-open" onclick="toggleLeaderboard()" class="bg-amber-500 hover:bg-amber-400 text-black px-5 py-3 rounded-xl font-black text-xs border-b-4 border-amber-800 active:translate-y-1">
+                    LEADERBOARD
+                </button>
             </div>
         </div>
 
-        <div class="flex gap-3">
-            <button id="btn-retry" onclick="launchGame()" class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-2.5 rounded-lg border-b-4 border-amber-800 text-xs font-black">
-                ULITIN! (RETRY)
-            </button>
-            <button id="btn-leaderboard-open" onclick="toggleLeaderboard()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-4 py-2.5 rounded-lg border border-amber-500/50 text-xs">
-                LEADERBOARD
+        <!-- LEADERBOARD MODAL -->
+        <div id="modal-leaderboard" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-4 text-center">
+            <h3 id="leaderboard-heading" class="text-xl text-amber-400 mb-3 tracking-wider">🏆 ISABELA HALL OF FAME 🏆</h3>
+            <div id="leaderboard-list" class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-xl p-3 mb-4 text-[10px] space-y-2">
+            </div>
+            <button id="btn-leaderboard-close" onclick="toggleLeaderboard()" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded text-xs">
+                ISARA (CLOSE)
             </button>
         </div>
-    </div>
 
-    <!-- LEADERBOARD MODAL -->
-    <div id="modal-leaderboard" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-4 text-center">
-        <h3 id="leaderboard-heading" class="text-xl text-amber-400 mb-3 tracking-wider">🏆 ISABELA HALL OF FAME 🏆</h3>
-        <div id="leaderboard-list" class="w-full max-w-sm bg-slate-900 border border-amber-500/50 rounded-xl p-3 mb-4 text-[10px] space-y-2">
-        </div>
-        <button id="btn-leaderboard-close" onclick="toggleLeaderboard()" class="bg-rose-700 hover:bg-rose-600 text-white px-6 py-2 rounded text-xs">
-            ISARA (CLOSE)
-        </button>
     </div>
-
-    <!-- Mobile Touch Controls -->
-    <div id="mobile-controls" class="absolute bottom-2 left-0 w-full px-4 py-1 flex justify-between items-center z-20 md:hidden pointer-events-auto">
-        <div class="flex gap-2">
-            <button id="touch-left" class="w-14 h-14 bg-slate-900/80 active:bg-amber-600 border-2 border-amber-500/50 rounded-2xl flex items-center justify-center text-xl text-amber-300 shadow-lg active:scale-95 transition-transform">
-                ◀
-            </button>
-            <button id="touch-right" class="w-14 h-14 bg-slate-900/80 active:bg-amber-600 border-2 border-amber-500/50 rounded-2xl flex items-center justify-center text-xl text-amber-300 shadow-lg active:scale-95 transition-transform">
-                ▶
-            </button>
-        </div>
-        <div class="flex gap-2">
-            <button id="touch-jump" class="w-16 h-14 bg-blue-950/80 active:bg-blue-600 border-2 border-blue-500/50 rounded-2xl flex flex-col items-center justify-center text-xs text-blue-300 shadow-lg active:scale-95 transition-transform">
-                <span class="text-sm">🦘</span>
-                <span class="text-[8px] font-bold">JUMP</span>
-            </button>
-            <button id="touch-dash" class="w-16 h-14 bg-red-950/80 active:bg-red-600 border-2 border-red-500/50 rounded-2xl flex flex-col items-center justify-center text-xs text-red-300 shadow-lg active:scale-95 transition-transform">
-                <span class="text-sm">⚡</span>
-                <span class="text-[8px] font-bold">DASH</span>
-            </button>
-        </div>
-    </div>
-
-</div>
 
 <!-- SOUND SYNTHESIZER & GAME ENGINE -->
 <script>
@@ -352,12 +377,17 @@
             record: "RECORD:",
             rank: "RANK:",
             startBtn: "SUMABAK NA! (START)",
+            touchHint: "📱 I-DRAG ANG DALIRI SA SCREEN O GAMITIN ANG BUTTONS • SWIPE UP = TALON",
+            jumpBtn: "TALON",
+            dashBtn: "HARUROT",
+            soberCoffeeMsg: "☕ KAPE! NAHIMASMASAN! (-30% TAMA)",
+            soberWaterMsg: "🧊 ICE TUBIG! PRESKO! (-20% TAMA)",
+            soberSisigMsg: "🍳 SIZZLING SISIG! (-25% TAMA & +❤️)",
             guideHtml: `
-                <p>🍺 <span class="text-amber-300">Hulihin ang Monkey Business:</span> +₱100 & tataas ang Tama.</p>
-                <p>🌀 <span class="text-purple-300">May Tama (Lasing):</span> 2X & 3X Points pero hahataw ang gewang!</p>
-                <p>🥖 <span class="text-rose-400">Iwas Skrap sa Taas:</span> Bato-batong pandesal, boteng basag, sparkplug!</p>
-                <p>🐕 <span class="text-amber-400">Panganib sa Lupa:</span> Tumalon (W/Up/Space) para iwasan ang Askal, Adik sa Kanto, at Patrol Pulis!</p>
-                <p>😵 <span class="text-red-400">100% BAC:</span> Babagsak at tutulog si unggoy sa palayan!</p>
+                <p>📱 <span class="text-emerald-300">Mobile Controls:</span> Gamitin ang malalaking buttons sa baba O i-slide ang daliri sa screen! (Swipe Up = Talon)</p>
+                <p>🍺 <span class="text-amber-300">Monkey Business:</span> +₱100 & tataas ang Tama (2X at 3X Bonus!).</p>
+                <p>☕ <span class="text-cyan-300">Pampatanggal Amat (Power-Ups):</span> Saluhin ang <b>Kape</b>, <b>Ice Tubig</b>, at <b>Sisig (+❤️)</b> para bumaba ang lasing!</p>
+                <p>🐕 <span class="text-amber-400">Sa Kalsada & Taas:</span> Iwasan ang Skrap sa taas at tumalon (🦘) sa Askal, Adik, at Pulis!</p>
             `,
             gameoverBanner: "⚠️ OPISYAL NA BLOTTER REPORT NG BARANGAY ⚠️",
             gameoverTitle: "BAGSAK SI GAGONG UNGGOY!",
@@ -431,12 +461,17 @@
             record: "RECORD:",
             rank: "RANK:",
             startBtn: "LET'S RUMBLE! (START)",
+            touchHint: "📱 SLIDE FINGER ON SCREEN OR USE ARCADE PAD • SWIPE UP = JUMP",
+            jumpBtn: "JUMP",
+            dashBtn: "DASH",
+            soberCoffeeMsg: "☕ BARAKO COFFEE! SOBERED UP! (-30%)",
+            soberWaterMsg: "🧊 ICE TUBIG! REFRESHED! (-20%)",
+            soberSisigMsg: "🍳 SIZZLING SISIG! (-25% & +❤️)",
             guideHtml: `
-                <p>🍺 <span class="text-amber-300">Catch Monkey Business Rum:</span> +₱100 & fills Drunk-o-meter.</p>
-                <p>🌀 <span class="text-purple-300">Tipsy / Drunk:</span> 2X & 3X multipliers, but monkey starts swaying!</p>
-                <p>🥖 <span class="text-rose-400">Dodge Aerial Junk:</span> Hard pandesal, broken bottles & gossip!</p>
-                <p>🐕 <span class="text-amber-400">Ground Hazards:</span> Jump (W/Up/Space) to leap over stray dogs, street addicts & police checkpoints!</p>
-                <p>😵 <span class="text-red-400">100% BAC:</span> Faceplant in the cornfield and fall asleep!</p>
+                <p>📱 <span class="text-emerald-300">Mobile Friendly:</span> Use the big bottom arcade buttons OR drag your finger directly on the road! (Swipe Up = Jump)</p>
+                <p>🍺 <span class="text-amber-300">Catch Rum:</span> +₱100 & fills Drunk-o-meter (2X & 3X multipliers!).</p>
+                <p>☕ <span class="text-cyan-300">Sober Power-Ups:</span> Catch <b>Barako Coffee</b>, <b>Ice Tubig</b> & <b>Sisig (+❤️)</b> to lower BAC before passing out!</p>
+                <p>🐕 <span class="text-amber-400">Hazards:</span> Dodge flying junk & tap JUMP (🦘) over stray dogs, addicts & police!</p>
             `,
             gameoverBanner: "⚠️ OFFICIAL POLICE & BARANGAY INCIDENT REPORT ⚠️",
             gameoverTitle: "MONKEY DOWN & OUT!",
@@ -528,6 +563,9 @@
         document.getElementById('lbl-rank').innerText = t.rank;
         document.getElementById('guide-box').innerHTML = t.guideHtml;
         document.getElementById('btn-start-game').innerText = t.startBtn;
+        document.getElementById('touch-hint-pill').innerText = t.touchHint;
+        document.getElementById('lbl-btn-jump').innerText = t.jumpBtn;
+        document.getElementById('lbl-btn-dash').innerText = t.dashBtn;
 
         const tlBtn = document.getElementById('btn-lang-tl');
         const enBtn = document.getElementById('btn-lang-en');
@@ -700,6 +738,23 @@
             osc.start(now);
             osc.stop(now + 0.25);
         },
+        playSoberPowerup() {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const start = now + idx * 0.055;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, start);
+                gain.gain.setValueAtTime(0.3, start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + 0.14);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(start);
+                osc.stop(start + 0.14);
+            });
+        },
         playHitBonk() {
             if (!this.ctx) return;
             const now = this.ctx.currentTime;
@@ -842,15 +897,20 @@
        5. CANVAS SETUP & GAME CONSTANTS
        ========================================================================== */
     const canvas = document.getElementById('gameCanvas');
+    const canvasWrapper = document.getElementById('canvas-wrapper');
     const ctx = canvas.getContext('2d');
     const cabinet = document.getElementById('game-cabinet');
 
     function resize() {
-        canvas.width = cabinet.clientWidth;
-        canvas.height = cabinet.clientHeight;
+        canvas.width = canvasWrapper.clientWidth;
+        canvas.height = canvasWrapper.clientHeight;
+        monkey.groundY = canvas.height - 80 - monkey.height;
+        if (monkey.isGrounded) {
+            monkey.y = monkey.groundY;
+        }
     }
     window.addEventListener('resize', resize);
-    resize();
+    setTimeout(resize, 20);
 
     let state = 'MENU';
     let score = 0;
@@ -902,6 +962,14 @@
     }));
 
     const keys = { left: false, right: false, jump: false, dash: false };
+    // Direct Canvas Touch-Follow State for effortless 1-thumb mobile play
+    const touchFollow = {
+        active: false,
+        targetX: null,
+        startX: 0,
+        startY: 0,
+        lastTapTime: 0
+    };
 
     /* ==========================================================================
        6. ISABELA SCENERY & PROCEDURAL ASSETS
@@ -1380,6 +1448,76 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(-4, -2, 8, 4);
 
+        } else if (it.type === 'kape') {
+            // Cyan glowing aura for Sober Power-up
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.28)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 18, 0, Math.PI * 2);
+            ctx.fill();
+            // White/Red 3-in-1 Coffee Mug
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-9, -8, 18, 20);
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(-9, -2, 18, 6);
+            // Mug handle
+            ctx.strokeStyle = '#f8fafc';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(7, -4, 5, 10);
+            // Dark Barako coffee top & steam
+            ctx.fillStyle = '#451a03';
+            ctx.fillRect(-7, -8, 14, 3);
+            ctx.strokeStyle = '#bae6fd';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-4, -11); ctx.lineTo(-2, -17);
+            ctx.moveTo(3, -11); ctx.lineTo(5, -17);
+            ctx.stroke();
+
+        } else if (it.type === 'icetubig') {
+            // Plastic tied bag of cold Ice Tubig
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.ellipse(0, 3, 11, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // White ice highlight & tied plastic knot on top
+            ctx.fillStyle = '#e0f2fe';
+            ctx.fillRect(-5, -2, 5, 8);
+            ctx.fillRect(-3, -14, 6, 5);
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-5, -9); ctx.lineTo(5, -9);
+            ctx.stroke();
+
+        } else if (it.type === 'sisig') {
+            // Golden/Emerald aura for Sizzling Sisig (Heals + Sobers)
+            ctx.fillStyle = 'rgba(74, 222, 128, 0.3)';
+            ctx.beginPath();
+            ctx.arc(0, 0, 19, 0, Math.PI * 2);
+            ctx.fill();
+            // Black cast-iron sizzling plate
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 15, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Chopped pork sisig & sunny-side egg in the middle
+            ctx.fillStyle = '#d97706';
+            ctx.beginPath();
+            ctx.ellipse(0, 1, 11, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(0, 1, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.arc(0, 1, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
         } else if (it.type === 'pandesal') {
             ctx.fillStyle = '#b45309';
             ctx.beginPath();
@@ -1445,13 +1583,79 @@
 
     function bindTouch(elem, keyName) {
         if (!elem) return;
-        elem.addEventListener('touchstart', (e) => { e.preventDefault(); SoundFX.init(); keys[keyName] = true; });
-        elem.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+        const activate = (e) => {
+            e.preventDefault();
+            SoundFX.init();
+            keys[keyName] = true;
+            elem.classList.add('ctrl-btn-active');
+            if (navigator.vibrate) navigator.vibrate(12);
+        };
+        const deactivate = (e) => {
+            e.preventDefault();
+            keys[keyName] = false;
+            elem.classList.remove('ctrl-btn-active');
+        };
+        elem.addEventListener('touchstart', activate, { passive: false });
+        elem.addEventListener('touchend', deactivate, { passive: false });
+        elem.addEventListener('touchcancel', deactivate, { passive: false });
+        elem.addEventListener('mousedown', activate);
+        elem.addEventListener('mouseup', deactivate);
+        elem.addEventListener('mouseleave', deactivate);
     }
     bindTouch(touchLeft, 'left');
     bindTouch(touchRight, 'right');
     bindTouch(touchJump, 'jump');
     bindTouch(touchDash, 'dash');
+
+    // DIRECT SCREEN TOUCH-DRAG & SWIPE GESTURES ON CANVAS
+    canvas.addEventListener('touchstart', (e) => {
+        if (state !== 'PLAYING') return;
+        e.preventDefault();
+        SoundFX.init();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        touchFollow.active = true;
+        touchFollow.targetX = x;
+        touchFollow.startX = x;
+        touchFollow.startY = y;
+
+        // Double tap on screen triggers Dash!
+        const now = Date.now();
+        if (now - touchFollow.lastTapTime < 260) {
+            keys.dash = true;
+            setTimeout(() => { keys.dash = false; }, 150);
+        }
+        touchFollow.lastTapTime = now;
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (state !== 'PLAYING' || !touchFollow.active) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        touchFollow.targetX = x;
+
+        // Swipe Up gesture triggers Jump!
+        if (touchFollow.startY - y > 38 && monkey.isGrounded) {
+            keys.jump = true;
+            touchFollow.startY = y;
+            if (navigator.vibrate) navigator.vibrate(15);
+            setTimeout(() => { keys.jump = false; }, 120);
+        }
+    }, { passive: false });
+
+    const endCanvasTouch = (e) => {
+        touchFollow.active = false;
+        touchFollow.targetX = null;
+    };
+    canvas.addEventListener('touchend', endCanvasTouch);
+    canvas.addEventListener('touchcancel', endCanvasTouch);
 
     let spawnCooldown = 0;
     let groundHazardCooldown = 120;
@@ -1488,10 +1692,22 @@
 
     function spawnDrop() {
         const currentLvl = LEVELS[currentLevelIdx];
-        const isBottle = Math.random() < 0.45;
+        const roll = Math.random();
         let type = 'bottle';
+        let category = 'bottle'; // 'bottle' | 'powerup' | 'trash'
 
-        if (!isBottle) {
+        // More likely to drop sober power-ups when the monkey is getting drunk!
+        const soberChance = drunkLevel >= 45 ? 0.24 : 0.14;
+
+        if (roll < 0.42) {
+            category = 'bottle';
+            type = 'bottle';
+        } else if (roll < 0.42 + soberChance) {
+            category = 'powerup';
+            const powerPool = ['kape', 'icetubig', 'sisig'];
+            type = powerPool[Math.floor(Math.random() * powerPool.length)];
+        } else {
+            category = 'trash';
             const trashPool = currentLvl.trashItems;
             type = trashPool[Math.floor(Math.random() * trashPool.length)];
         }
@@ -1504,11 +1720,12 @@
             width: 32,
             height: 32,
             vx: (Math.random() - 0.5) * 3,
-            vy: 2.8 + Math.random() * 2.5 + (currentLevelIdx * 0.7),
+            vy: (category === 'powerup' ? 2.4 : 2.8) + Math.random() * 2.3 + (currentLevelIdx * 0.65),
             type: type,
-            isBottle: isBottle,
-            rotation: Math.random() * Math.PI,
-            rotSpeed: (Math.random() - 0.5) * 0.15
+            category: category,
+            isBottle: category === 'bottle',
+            rotation: category === 'powerup' ? 0 : Math.random() * Math.PI,
+            rotSpeed: category === 'powerup' ? (Math.random() - 0.5) * 0.04 : (Math.random() - 0.5) * 0.15
         });
     }
 
@@ -1548,6 +1765,15 @@
             let moveDir = 0;
             if (keys.left) moveDir -= 1;
             if (keys.right) moveDir += 1;
+
+            // If player is dragging their finger directly on the canvas, smoothly run toward their finger
+            if (touchFollow.active && touchFollow.targetX !== null && !keys.left && !keys.right) {
+                const monkeyCenter = monkey.x + monkey.width / 2;
+                const diff = touchFollow.targetX - monkeyCenter;
+                if (Math.abs(diff) > 10) {
+                    moveDir = Math.max(-1, Math.min(1, diff / 35));
+                }
+            }
 
             if (drunkLevel >= 70) {
                 moveDir += Math.sin(Date.now() / 200) * 0.45;
@@ -1699,7 +1925,7 @@
                 it.y < catchBox.y + catchBox.height &&
                 it.y + it.height > catchBox.y
             ) {
-                if (it.isBottle) {
+                if (it.category === 'bottle') {
                     let multiplier = 1;
                     if (drunkLevel >= 70) multiplier = 3;
                     else if (drunkLevel >= 30) multiplier = 2;
@@ -1719,6 +1945,37 @@
                         addFloatingText(I18N[currentLang].passedOutNotice, monkey.x - 20, monkey.y - 30, '#ef4444');
                     } else if (drunkLevel > 60 && Math.random() < 0.25) {
                         SoundFX.playBurp();
+                    }
+
+                    if (score >= LEVELS[currentLevelIdx].targetScore && currentLevelIdx < LEVELS.length - 1) {
+                        currentLevelIdx++;
+                        addFloatingText(I18N[currentLang].levelUpNotice, canvas.width / 2 - 120, canvas.height / 2, '#4ade80');
+                        document.getElementById('level-badge').innerText = I18N[currentLang].levels[currentLevelIdx].name;
+                    }
+                } else if (it.category === 'powerup') {
+                    SoundFX.playSoberPowerup();
+                    // Instant wake-up if a powerup falls on a passed-out monkey!
+                    if (monkey.isPassedOut) {
+                        monkey.isPassedOut = false;
+                        passOutTimer = 0;
+                    }
+
+                    if (it.type === 'kape') {
+                        drunkLevel = Math.max(0, drunkLevel - 30);
+                        score += 75;
+                        createSparks(it.x, it.y, 12, '#38bdf8');
+                        addFloatingText(I18N[currentLang].soberCoffeeMsg, Math.max(10, it.x - 40), it.y - 15, '#38bdf8');
+                    } else if (it.type === 'icetubig') {
+                        drunkLevel = Math.max(0, drunkLevel - 20);
+                        score += 50;
+                        createSparks(it.x, it.y, 12, '#bae6fd');
+                        addFloatingText(I18N[currentLang].soberWaterMsg, Math.max(10, it.x - 40), it.y - 15, '#7dd3fc');
+                    } else if (it.type === 'sisig') {
+                        drunkLevel = Math.max(0, drunkLevel - 25);
+                        score += 250;
+                        if (lives < 3) lives++;
+                        createSparks(it.x, it.y, 16, '#4ade80');
+                        addFloatingText(I18N[currentLang].soberSisigMsg, Math.max(10, it.x - 45), it.y - 15, '#4ade80');
                     }
 
                     if (score >= LEVELS[currentLevelIdx].targetScore && currentLevelIdx < LEVELS.length - 1) {
@@ -1872,6 +2129,7 @@
         document.getElementById('modal-gameover').classList.add('hidden');
         document.getElementById('modal-leaderboard').classList.add('hidden');
 
+        resize();
         score = 0;
         lives = 3;
         bottlesCount = 0;
